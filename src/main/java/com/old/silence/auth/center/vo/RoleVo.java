@@ -31,7 +31,7 @@ public class RoleVo {
     /**
      * 状态：0-禁用，1-启用
      */
-    private Integer status;
+    private Boolean status;
 
     private List<BigInteger> menuIds;
 
@@ -67,11 +67,11 @@ public class RoleVo {
         this.description = description;
     }
 
-    public Integer getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 

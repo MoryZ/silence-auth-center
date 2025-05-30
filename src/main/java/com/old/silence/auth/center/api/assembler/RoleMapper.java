@@ -1,6 +1,5 @@
 package com.old.silence.auth.center.api.assembler;
 
-import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 import com.old.silence.auth.center.api.config.AuthCenterMapStructSpringConfig;
@@ -15,8 +14,6 @@ import com.old.silence.auth.center.vo.RoleVo;
 
 @Mapper(uses = AuthCenterMapStructSpringConfig.class)
 public interface RoleMapper extends Converter<RoleCommand, Role> {
-
-    Role convert(@NotNull RoleCommand roleCommand);
 
     RoleVo convertToDto(Role role);
 

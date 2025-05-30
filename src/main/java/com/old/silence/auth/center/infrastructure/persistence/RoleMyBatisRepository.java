@@ -92,7 +92,7 @@ public class RoleMyBatisRepository implements RoleRepository {
     }
 
 
-    public void assignRoleMenus(BigInteger roleId, List<BigInteger> menuIds) {
+    public void assignRoleMenus(BigInteger roleId, Set<BigInteger> menuIds) {
         // 删除原有菜单权限
         roleMenuDao.delete(new LambdaQueryWrapper<RoleMenu>()
                 .eq(RoleMenu::getRoleId, roleId));

@@ -13,6 +13,8 @@ public class SilencePrincipal {
     private String cnName;
     private Set<Role> roles;
 
+    public SilencePrincipal() {
+    }
 
     public SilencePrincipal(Set<Role> roles) {
         this.roles = roles;
