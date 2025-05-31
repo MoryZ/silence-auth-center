@@ -1,0 +1,68 @@
+Index: src/main/java/com/old/silence/auth/center/AuthCenterApplication.java
+===================================================================
+diff --git a/src/main/java/com/old/silence/auth/center/AuthCenterApplication.java b/src/main/java/com/old/silence/auth/center/AuthCenterApplication.java
+deleted file mode 100644
+--- a/src/main/java/com/old/silence/auth/center/AuthCenterApplication.java	(revision 19468efeef6360b4031066f60362363d030fae8e)
++++ /dev/null	(revision 19468efeef6360b4031066f60362363d030fae8e)
+@@ -1,15 +0,0 @@
+-package com.old.silence.auth.center;
+-
+-import org.springframework.boot.SpringApplication;
+-import org.springframework.boot.autoconfigure.SpringBootApplication;
+-
+-/**
+- * @author moryzang
+- */
+-@SpringBootApplication
+-public class AuthCenterApplication {
+-
+-    public static void main(String[] args) {
+-        SpringApplication.run(AuthCenterApplication.class);
+-    }
+-}
+Index: src/main/resources/application.yml
+===================================================================
+diff --git a/src/main/resources/application.yml b/src/main/resources/application.yml
+deleted file mode 100644
+--- a/src/main/resources/application.yml	(revision 19468efeef6360b4031066f60362363d030fae8e)
++++ /dev/null	(revision 19468efeef6360b4031066f60362363d030fae8e)
+@@ -1,39 +0,0 @@
+-server:
+-  port: 8098
+-
+-spring:
+-  datasource:
+-    driver-class-name: com.mysql.jdbc.Driver
+-    url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+-    username: root
+-    password: admin123456
+-    hikari:
+-      connection-timeout: 30000
+-      minimum-idle: 5
+-      maximum-pool-size: 100
+-      auto-commit: true
+-      idle-timeout: 30000
+-      pool-name: silence_auth_center
+-      max-lifetime: 1800000
+-
+-mybatis-plus:
+-  configuration:
+-    # 开启驼峰命名映射
+-    map-underscore-to-camel-case: true
+-    # 日志输出 SQL
+-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+-    default-enum-type-handler: com.old.silence.data.commons.handler.GenericEnumTypeHandler
+-  global-config:
+-    db-config:
+-      # 全局主键类型（可选）
+-      id-type: auto
+-      # 逻辑删除字段（可选）
+-      logic-delete-field: is_deleted
+-      logic-not-delete-value: 0
+-      logic-delete-value: 1
+-  type-handlers-package: com.old.silence.data.commons.handler
+-
+-platform:
+-  system:
+-    identifier: AC
+-
