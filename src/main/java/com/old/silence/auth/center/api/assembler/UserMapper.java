@@ -12,7 +12,7 @@ import com.old.silence.auth.center.vo.UserVo;
  * @author moryzang
  */
 
-@Mapper(uses = AuthCenterMapStructSpringConfig.class)
+@Mapper1(uses = AuthCenterMapStructSpringConfig.class)
 public interface UserMapper extends Converter<UserCommand, User> {
 
     User convert(@NotNull UserCommand userCommand);
