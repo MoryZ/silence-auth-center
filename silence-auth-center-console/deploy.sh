@@ -1,10 +1,10 @@
 #!/bin/bash
-APP_NAME="silence-auth-center-1.0.0-SNAPSHOT.jar"
+APP_NAME="silence-auth-center-console-1.0.0-SNAPSHOT.jar"
 LOG_FILE="app.log"
 
 case "$1" in
     start)
-        nohup java -jar $APP_NAME --spring.profiles.active=prod > $LOG_FILE 2>&1 &
+        nohup java -jar $APP_NAME --spring.profiles.active=prd > $LOG_FILE 2>&1 &
         echo "应用启动成功，PID: $!"
         ;;
     stop)
