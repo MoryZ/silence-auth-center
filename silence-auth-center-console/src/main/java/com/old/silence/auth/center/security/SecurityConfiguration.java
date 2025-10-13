@@ -32,6 +32,7 @@ public class SecurityConfiguration {
                 .antMatchers("/api/v1/auth/login").permitAll()
                 .antMatchers("/api/v1/auth/logout").permitAll()
                 .antMatchers("/api/v1/captcha/image").permitAll()
+                .antMatchers("/api/v1/ocr/extractTextFromImage").permitAll()
                 .anyRequest().authenticated();
         http.exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 

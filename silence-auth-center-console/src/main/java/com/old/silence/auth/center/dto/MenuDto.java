@@ -2,6 +2,7 @@ package com.old.silence.auth.center.dto;
 
 
 import com.old.silence.auth.center.enums.MenuType;
+import com.old.silence.auth.center.enums.ModuleType;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -27,6 +28,8 @@ public class MenuDto {
      * 菜单类型：1-目录，2-菜单，3-按钮
      */
     private MenuType type;
+
+    private ModuleType moduleType;
 
 
     /**
@@ -91,6 +94,14 @@ public class MenuDto {
 
     public void setType(MenuType type) {
         this.type = type;
+    }
+
+    public ModuleType getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(ModuleType moduleType) {
+        this.moduleType = moduleType;
     }
 
     public String getPath() {

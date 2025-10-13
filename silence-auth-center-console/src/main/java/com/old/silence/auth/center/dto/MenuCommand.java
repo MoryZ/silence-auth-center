@@ -3,6 +3,8 @@ package com.old.silence.auth.center.dto;
 
 import com.old.silence.auth.center.enums.MenuType;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -12,16 +14,19 @@ public class MenuCommand {
     /**
      * 父菜单ID
      */
+    @NotNull
     private BigInteger parentId;
 
     /**
      * 菜单名称
      */
+    @NotBlank
     private String name;
 
     /**
      * 菜单类型：1-目录，2-菜单，3-按钮
      */
+    @NotNull
     private MenuType type;
 
 
@@ -48,6 +53,7 @@ public class MenuCommand {
     /**
      * 显示顺序
      */
+    @NotNull
     private Long sort;
 
     /**

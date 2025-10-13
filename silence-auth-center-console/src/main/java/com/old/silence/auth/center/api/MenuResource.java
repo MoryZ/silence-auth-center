@@ -1,6 +1,7 @@
 package com.old.silence.auth.center.api;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,14 +65,14 @@ public class MenuResource {
 
     @PostMapping("/menus")
     @PreAuthorize("hasAuthority('system:SysMenu:add')")
-    public BigInteger create(@RequestBody MenuCommand menuCommand) {
+    public BigInteger create(@RequestBody @Validated MenuCommand menuCommand) {
         var menu = menuMapper.convert(menuCommand);
         return menuService.create(menu);
     }
 
     @PutMapping("/menus/{id}")
     @PreAuthorize("hasAuthority('system:SysMenu:edit')")
-    public void update(@PathVariable BigInteger id, @RequestBody MenuCommand menuCommand) {
+    public void update(@PathVariable BigInteger id, @RequestBody @Validated MenuCommand menuCommand) {
         var menu =menuMapper.convert(menuCommand);
         menu.setId(id); //NO SONAR
         menuService.update(menu);
@@ -83,10 +84,16 @@ public class MenuResource {
         menuService.delete(id);
     }
 
+    @PutMapping("/menus/{id}/enable")
+    @PreAuthorize("hasAuthority('system:SysMenu:enable')")
+    public void enable(@PathVariable BigInteger id) {
+        menuService.updateMenuStatus(id, true);
+    }
+
     @PutMapping("/menus/{id}/disable")
-    @PreAuthorize("hasAuthority('system:SysMenu:edit')")
-    public void updateSysMenuStatus(@PathVariable BigInteger id, @RequestParam Boolean status) {
-        menuService.updateMenuStatus(id, status);
+    @PreAuthorize("hasAuthority('system:SysMenu:disable')")
+    public void disable(@PathVariable BigInteger id) {
+        menuService.updateMenuStatus(id, false);
     }
 
 

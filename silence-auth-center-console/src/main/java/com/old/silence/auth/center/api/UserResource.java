@@ -1,6 +1,7 @@
 package com.old.silence.auth.center.api;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,11 +16,13 @@ import com.old.silence.auth.center.api.assembler.UserMapper;
 import com.old.silence.auth.center.domain.model.User;
 import com.old.silence.auth.center.domain.service.UserService;
 import com.old.silence.auth.center.dto.UserCommand;
+import com.old.silence.auth.center.dto.UserPasswordCommand;
 import com.old.silence.auth.center.dto.UserQuery;
 import com.old.silence.auth.center.vo.UserVo;
 import com.old.silence.data.commons.converter.QueryWrapperConverter;
 
 
+import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,12 @@ public class UserResource {
     public UserResource(UserMapper userMapper, UserService userService) {
         this.userMapper = userMapper;
         this.userService = userService;
+    }
+
+    @GetMapping("/users/{id}/roles")
+    @PreAuthorize("hasAuthority('system:user:list')")
+    public List<BigInteger>getUserRoleIds(@PathVariable BigInteger id) {
+        return userService.getUserRoleIds(id);
     }
 
     @GetMapping(value = "/users", params = {"pageNo", "pageSize"})
@@ -65,40 +73,35 @@ public class UserResource {
         user.setId(id); //NO SONAR
         userService.update(user);
     }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:user:delete')")
-    public void deleteUser(@PathVariable BigInteger id) {
-        userService.delete(id);
-    }
-
-    @PutMapping("/{id}/disable")
+    @PutMapping("/users/{id}/disable")
     @PreAuthorize("hasAuthority('system:user:edit')")
     public void disable(@PathVariable BigInteger id) {
         userService.updateUserStatus(id, false);
     }
 
-    @PutMapping("/{id}/enable")
+    @PutMapping("/users/{id}/enable")
     @PreAuthorize("hasAuthority('system:user:edit')")
     public void enable(@PathVariable BigInteger id) {
         userService.updateUserStatus(id, true);
     }
 
-    @PutMapping("/{id}/password")
+    @PutMapping("/users/{id}/resetPassword")
     @PreAuthorize("hasAuthority('system:user:reset-password')")
-    public void resetPassword(@PathVariable BigInteger id, @RequestParam String password) {
-        userService.resetPassword(id, password);
+    public void resetPassword(@PathVariable BigInteger id, @RequestBody @Validated UserPasswordCommand userPasswordCommand) {
+        userService.resetPassword(id, userPasswordCommand.getNewPassword());
     }
 
-    @GetMapping("/{id}/roles")
-    @PreAuthorize("hasAuthority('system:user:list')")
-    public List<BigInteger>getUserRoleIds(@PathVariable BigInteger id) {
-        return userService.getUserRoleIds(id);
-    }
 
-    @PutMapping("/{id}/roles")
+    @PutMapping("/users/{id}/roles")
     @PreAuthorize("hasAuthority('system:user:edit')")
-    public void assignUserRoles(@PathVariable BigInteger id, @RequestBody Set<BigInteger> roleIds) {
+    public void assignUserRoles(@PathVariable BigInteger id, @RequestBody @NotEmpty Set<BigInteger> roleIds) {
         userService.assignUserRoles(id, roleIds);
     }
+
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasAuthority('system:user:delete')")
+    public void deleteUser(@PathVariable BigInteger id) {
+        userService.delete(id);
+    }
+
 } 

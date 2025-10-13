@@ -2,13 +2,17 @@ server:
   port: 8096
 
 spring:
-  application:
-    name: auth-service
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 60MB
+  application.name: auth-service
+  messages.basename: messages/silence_auth_center_messages
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: admin123456
+    password: 123456
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: 30000
@@ -21,7 +25,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: http://localhost:8848
         username: nacos
         password: nacos
   redis:

@@ -21,6 +21,7 @@ import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,28 +100,26 @@ public class MenuService {
         // 检查菜单是否存在
         Menu menu = menuRepository.findById(id);
         if (menu == null || menu.getDeleted() ) {
-            throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
+            throw AuthCenterMessages.MENU_NOT_EXIST.createException();
         }
 
         // 检查是否有子菜单
         boolean hasChildren = menuRepository.existsByParentIdAndDeleted(id, false);
         if (hasChildren) {
-            throw AuthCenterMessages.MENU_NOT_EXIST.createException("存在子菜单");
+            throw AuthCenterMessages.SUB_MENU_EXIST.createException();
         }
 
         // 逻辑删除菜单
         menu.setDeleted(true);
         menuRepository.delete(id);
 
-
     }
 
-    
     public void updateMenuStatus(BigInteger id, Boolean status) {
         // 检查菜单是否存在
         Menu menu = menuRepository.findById(id);
         if (menu == null || menu.getDeleted() ) {
-            throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
+            throw AuthCenterMessages.MENU_NOT_EXIST.createException();
         }
 
         // 更新状态
@@ -155,6 +154,9 @@ public class MenuService {
                     .stream()
                     .map(RoleMenu::getMenuId)
                     .collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(menuIds)) {
+                return List.of();
+            }
 
             // 获取权限标识列表
             menus = menuRepository.findByIdInAndDeletedAndTypeInAndStatus(menuIds, false, List.of(MenuType.CONTENTS, MenuType.MENU), true);

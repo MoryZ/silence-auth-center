@@ -5,11 +5,14 @@ import com.old.silence.core.context.ErrorCodedEnumMessageSourceResolvable;
 
 public enum AuthCenterMessages implements ErrorCodedEnumMessageSourceResolvable {
 
-
-    MENU_NOT_EXIST(HttpStatus.BAD_REQUEST, 30001),
-    SUB_MENUS_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 30002),
-    ROLE_NOT_EXIST(HttpStatus.BAD_REQUEST, 30003),
-    ROLE_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 30004),
+    USER_NOT_EXIST(HttpStatus.BAD_REQUEST, 51),
+    PASSWORD_NOT_CORRECT(HttpStatus.BAD_REQUEST, 52),
+    PASSWORD_COMPLEXITY_NOT_MATCHED(HttpStatus.BAD_REQUEST, 53), // "密码必须包含字母、数字和特殊字符"
+    MENU_NOT_EXIST(HttpStatus.BAD_REQUEST, 54),
+    SUB_MENU_EXIST(HttpStatus.BAD_REQUEST, 55),
+    SUB_MENUS_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 56),
+    ROLE_NOT_EXIST(HttpStatus.BAD_REQUEST, 57),
+    ROLE_CODE_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 58),
 
     ;
 

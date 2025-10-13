@@ -1,13 +1,15 @@
 package com.old.silence.auth.center.vo;
 
 
+import com.old.silence.data.commons.domain.AuditableVo;
+
 import java.math.BigInteger;
 import java.util.List;
 
 /**
  * @author moryzang
  */
-public class UserVo {
+public class UserVo extends AuditableVo {
     /**
      * 用户ID
      */
@@ -17,6 +19,8 @@ public class UserVo {
      * 用户名
      */
     private String username;
+
+    private Boolean status;
 
     /**
      * 头像URL
@@ -62,6 +66,14 @@ public class UserVo {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 
     public String getAvatar() {

@@ -1,9 +1,9 @@
 package com.old.silence.auth.center.api;
 
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.old.silence.auth.center.domain.service.AuthService;
 import com.old.silence.auth.center.dto.LoginCommand;
@@ -20,7 +20,7 @@ public class AuthResource {
     }
 
     @PostMapping("/auth/login")
-    public LoginVo login(@RequestBody LoginCommand request) {
+    public LoginVo login(@RequestBody @Validated LoginCommand request) {
         return authService.login(request);
     }
 
@@ -29,8 +29,4 @@ public class AuthResource {
         authService.logout();
     }
 
-    @PostMapping("/auth/refresh")
-    public LoginVo refreshToken(@RequestParam String refreshToken) {
-        return authService.refreshToken(refreshToken);
-    }
 } 

@@ -1,6 +1,10 @@
 package com.old.silence.auth.center.dto;
 
 
+import com.old.silence.validation.group.OnlyOnCreationValidation;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -13,7 +17,12 @@ public class UserCommand {
     /**
      * 用户名
      */
+    @NotBlank
     private String username;
+
+    @NotBlank(groups = OnlyOnCreationValidation.class)
+    @Size(min = 8, max = 32)
+    private String password;
 
     /**
      * 头像URL
@@ -63,6 +72,14 @@ public class UserCommand {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getAvatar() {

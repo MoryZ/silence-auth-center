@@ -24,7 +24,7 @@ public class UserQuery {
     private String phone;
 
     /**
-     * 状态：0-禁用，1-启用
+     * 状态：false-禁用，true-启用
      */
     @RelationalQueryProperty(type = Part.Type.SIMPLE_PROPERTY)
     private Boolean status;

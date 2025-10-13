@@ -14,6 +14,8 @@ import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.vo.RoleVo;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,12 +30,7 @@ public class RoleService {
         this.roleMenuRepository = roleMenuRepository;
     }
 
-
-    public Page<Role> query(Page<Role> page, QueryWrapper<Role> queryWrapper) {
-        // 构建查询条件
-        queryWrapper.orderByDesc( "created_date");
-
-        // 执行分页查询
+    public Page<Role> queryPage(Page<Role> page, QueryWrapper<Role> queryWrapper) {
         return roleRepository.query(page, queryWrapper);
     }
 
@@ -56,7 +53,7 @@ public class RoleService {
     public BigInteger create(Role role) {
         // 检查角色编码是否已存在
         if (isRoleCodeExists(role.getCode())) {
-            throw AuthCenterMessages.ROLE_ALREADY_EXIST.createException("角色编码已存在");
+            throw AuthCenterMessages.ROLE_CODE_ALREADY_EXIST.createException();
         }
         roleRepository.create(role);
 
@@ -72,7 +69,7 @@ public class RoleService {
         // 检查角色编码是否已被其他角色使用
         if (!existingRole.getCode().equals(role.getCode())
                 && isRoleCodeExists(role.getCode())) {
-            throw AuthCenterMessages.ROLE_ALREADY_EXIST.createException("角色编码已存在");
+            throw AuthCenterMessages.ROLE_CODE_ALREADY_EXIST.createException();
         }
 
         roleRepository.update(role);
@@ -95,7 +92,7 @@ public class RoleService {
         // 检查角色是否存在
         Role role = roleRepository.findById(id);
         if (role == null || role.getDeleted()) {
-            throw AuthCenterMessages.ROLE_NOT_EXIST.createException("角色不存在");
+            throw AuthCenterMessages.ROLE_NOT_EXIST.createException();
         }
         return role;
     }
@@ -130,7 +127,7 @@ public class RoleService {
     public void assignRoleMenus(BigInteger id, List<BigInteger> menuIds) {
         var role = roleRepository.findById(id);
         if (role == null || role.getDeleted()) {
-            throw AuthCenterMessages.ROLE_NOT_EXIST.createException("角色不存在");
+            throw AuthCenterMessages.ROLE_NOT_EXIST.createException();
         }
 
         // 清空角色菜单关联
@@ -138,10 +135,12 @@ public class RoleService {
 
 
         // 重新分配角色菜单关联
-        var roleMenus = menuIds.stream().map(menuId -> {
-            return new RoleMenu(id, menuId);
-        }).collect(Collectors.toList());
-
+        var roleMenus = menuIds.stream().map(menuId ->
+                new RoleMenu(id, menuId)).collect(Collectors.toList());
+        roleMenus.forEach(roleMenu -> {
+            roleMenu.setCreatedDate(Instant.now());
+            roleMenu.setUpdatedDate(Instant.now());
+        });
         roleMenuRepository.bulkInsert(roleMenus);
     }
 

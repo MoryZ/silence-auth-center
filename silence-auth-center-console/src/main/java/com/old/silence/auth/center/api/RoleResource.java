@@ -1,6 +1,7 @@
 package com.old.silence.auth.center.api;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,9 +36,9 @@ public class RoleResource {
 
     @GetMapping(value = "/roles", params = {"pageNo", "pageSize"})
     @PreAuthorize("hasAuthority('system:role:list')")
-    public Page<Role> query(Page<Role> page,RoleQuery query) {
+    public Page<Role> queryPage(Page<Role> page,RoleQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, Role.class);
-        return roleService.query(page, queryWrapper);
+        return roleService.queryPage(page, queryWrapper);
     }
 
     @GetMapping(path = "/roles", params = {"!pageNo", "!pageSize"})
@@ -54,14 +55,15 @@ public class RoleResource {
 
     @PostMapping("/roles")
     @PreAuthorize("hasAuthority('system:role:add')")
-    public BigInteger create(@RequestBody RoleCommand roleCommand) {
+    public BigInteger create(@RequestBody @Validated RoleCommand roleCommand) {
         var role = roleMapper.convert(roleCommand);
         return roleService.create(role);
     }
 
     @PutMapping("/roles/{id}")
     @PreAuthorize("hasAuthority('system:role:edit')")
-    public void update(@PathVariable BigInteger id, @RequestBody Role role) {
+    public void update(@PathVariable BigInteger id, @RequestBody RoleCommand roleCommand) {
+        var role = roleMapper.convert(roleCommand);
         role.setId(id);
         roleService.update(role);
     }

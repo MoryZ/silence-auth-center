@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.code.kaptcha.Producer;
+import com.old.silence.auth.center.enums.CaptchaType;
 import com.old.silence.auth.center.enums.RedisCacheEnum;
 import com.old.silence.auth.center.util.Base64Utils;
 
@@ -30,8 +31,8 @@ public class CaptchaResource {
     @Value("${silence.auth.center.captcha-enabled:true}")
     private boolean captchaEnabled;
 
-    @Value("${silence.auth.center.captcha-type:math}")
-    private String captchaType;
+    @Value("${silence.auth.center.captcha-type:MATH}")
+    private CaptchaType captchaType;
 
     private final Producer captchaProducer;
 
@@ -52,27 +53,29 @@ public class CaptchaResource {
      */
     @GetMapping("/captcha/image")
     public Map<String, Object> getCode() throws IOException {
-        Map<String, Object> ajax = new HashMap<>();
-        ajax.put("captchaEnabled", captchaEnabled);
+        Map<String, Object> objectHashMap = new HashMap<>();
+        objectHashMap.put("captchaEnabled", captchaEnabled);
         if (!captchaEnabled) {
-            return ajax;
+            return objectHashMap;
         }
 
         // 保存验证码信息
         String uuid = UUID.randomUUID().toString();
-        String verifyKey = RedisCacheEnum.CAPTCHA_CODE_KEY + uuid;
+        String verifyKey = RedisCacheEnum.CAPTCHA_CODE_KEY.getCacheKey(uuid);
 
         String capStr, code = null;
         BufferedImage image = null;
 
         // 生成验证码
-        if ("math".equals(captchaType)) {
+        if (CaptchaType.MATH.equals(captchaType)) {
             String capText = captchaProducerMath.createText();
             capStr = capText.substring(0, capText.lastIndexOf("@"));
             code = capText.substring(capText.lastIndexOf("@") + 1);
             image = captchaProducerMath.createImage(capStr);
-        } else if ("char".equals(captchaType)) {
-            capStr = code = captchaProducer.createText();
+        } else if (CaptchaType.CHAR.equals(captchaType)) {
+            String capText = captchaProducer.createText();
+            capStr = capText;
+            code = capText;
             image = captchaProducer.createImage(capStr);
         }
 
@@ -85,9 +88,9 @@ public class CaptchaResource {
             throw new IOException();
         }
 
-        ajax.put("uuid", uuid);
-        ajax.put("img", Base64Utils.encode(os.toByteArray()));
-        return ajax;
+        objectHashMap.put("uuid", uuid);
+        objectHashMap.put("img", Base64Utils.encode(os.toByteArray()));
+        return objectHashMap;
     }
 
 }
