@@ -1,5 +1,7 @@
 package com.old.silence.auth.center.api;
 
+import jakarta.validation.constraints.NotEmpty;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +24,6 @@ import com.old.silence.auth.center.vo.UserVo;
 import com.old.silence.data.commons.converter.QueryWrapperConverter;
 
 
-import javax.validation.constraints.NotEmpty;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;

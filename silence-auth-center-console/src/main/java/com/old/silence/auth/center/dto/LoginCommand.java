@@ -1,7 +1,7 @@
 package com.old.silence.auth.center.dto;
 
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginCommand {
     /**

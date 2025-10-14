@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: 123456
+    password: admin123456
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: 30000
@@ -28,7 +28,7 @@ spring:
         server-addr: http://localhost:8848
         username: nacos
         password: nacos
-  redis:
+  data.redis:
     # 主机
     host: 127.0.0.1
     # 数据库

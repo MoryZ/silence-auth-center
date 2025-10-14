@@ -1,10 +1,11 @@
 package com.old.silence.auth.center.dto;
 
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+
 import com.old.silence.auth.center.enums.MenuType;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Map;
 
