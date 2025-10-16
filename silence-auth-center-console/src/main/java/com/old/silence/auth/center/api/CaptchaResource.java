@@ -1,8 +1,6 @@
 package com.old.silence.auth.center.api;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.FastByteArrayOutputStream;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/api/v1")
 public class CaptchaResource {
 
-    @Value("${silence.auth.center.captcha-enabled:true}")
+    /*@Value("${silence.auth.center.captcha-enabled:true}")
     private boolean captchaEnabled;
 
     @Value("${silence.auth.center.captcha-type:MATH}")
@@ -48,9 +46,9 @@ public class CaptchaResource {
         this.valueOperations = stringRedisTemplate.opsForValue();
     }
 
-    /**
+    *//**
      * 生成验证码
-     */
+     *//*
     @GetMapping("/captcha/image")
     public Map<String, Object> getCode() throws IOException {
         Map<String, Object> objectHashMap = new HashMap<>();
@@ -91,6 +89,6 @@ public class CaptchaResource {
         objectHashMap.put("uuid", uuid);
         objectHashMap.put("img", Base64Utils.encode(os.toByteArray()));
         return objectHashMap;
-    }
+    }*/
 
 }

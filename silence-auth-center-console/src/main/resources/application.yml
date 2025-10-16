@@ -9,7 +9,7 @@ spring:
   application.name: auth-service
   messages.basename: messages/silence_auth_center_messages
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: admin123456
@@ -23,6 +23,10 @@ spring:
       pool-name: silence_auth_center_pool
       max-lifetime: 1800000
   cloud:
+    openfeign:
+      autoconfiguration:
+        jackson:
+          enabled: false
     nacos:
       discovery:
         server-addr: http://localhost:8848
