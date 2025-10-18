@@ -12,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: admin123456
+    password: 123456
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: 30000
@@ -29,7 +29,7 @@ spring:
           enabled: false
     nacos:
       discovery:
-        server-addr: http://localhost:8848
+        server-addr: http://www.silence-ci.com:8848
         username: nacos
         password: nacos
   data.redis:
