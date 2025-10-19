@@ -88,4 +88,16 @@ public class SilenceAuthCenterContextHolder {
         }).collect(Collectors.toSet());
     }
 
+    public static Set<String> getPermissions() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return Set.of();
+        } else {
+            var principal = authentication.getPrincipal();
+            return principal instanceof SilencePrincipal
+                    ? ((SilencePrincipal) principal).getPermissions()
+                    : Set.of(principal.toString());
+        }
+    }
+
 }

@@ -35,33 +35,33 @@ public class RoleResource {
     }
 
     @GetMapping(value = "/roles", params = {"pageNo", "pageSize"})
-    @PreAuthorize("hasAuthority('system:role:list')")
+    @PreAuthorize("@perm.hasAuthority('system:role:page')")
     public Page<Role> queryPage(Page<Role> page,RoleQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, Role.class);
         return roleService.queryPage(page, queryWrapper);
     }
 
     @GetMapping(path = "/roles", params = {"!pageNo", "!pageSize"})
-    @PreAuthorize("hasAuthority('system:role:list')")
+    @PreAuthorize("@perm.hasAuthority('system:role:list')")
     public List<RoleVo> listAllRoles() {
         return roleService.listAllRoles();
     }
 
     @GetMapping("/roles/{id}")
-    @PreAuthorize("hasAuthority('system:role:list')")
+    @PreAuthorize("@perm.hasAuthority('system:role:list')")
     public Role findById(@PathVariable BigInteger id) {
         return roleService.findById(id);
     }
 
     @PostMapping("/roles")
-    @PreAuthorize("hasAuthority('system:role:add')")
+    @PreAuthorize("@perm.hasAuthority('system:role:add')")
     public BigInteger create(@RequestBody @Validated RoleCommand roleCommand) {
         var role = roleMapper.convert(roleCommand);
         return roleService.create(role);
     }
 
     @PutMapping("/roles/{id}")
-    @PreAuthorize("hasAuthority('system:role:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:role:edit')")
     public void update(@PathVariable BigInteger id, @RequestBody RoleCommand roleCommand) {
         var role = roleMapper.convert(roleCommand);
         role.setId(id);
@@ -69,31 +69,31 @@ public class RoleResource {
     }
 
     @DeleteMapping("/roles/{id}")
-    @PreAuthorize("hasAuthority('system:role:delete')")
+    @PreAuthorize("@perm.hasAuthority('system:role:delete')")
     public void delete(@PathVariable BigInteger id) {
         roleService.delete(id);
     }
 
     @PutMapping("/roles/{id}/disable")
-    @PreAuthorize("hasAuthority('system:role:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:role:disable')")
     public void disable(@PathVariable BigInteger id) {
         roleService.updateStatus(id, false);
     }
 
     @PutMapping("/roles/{id}/enable")
-    @PreAuthorize("hasAuthority('system:role:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:role:enable')")
     public void enable(@PathVariable BigInteger id) {
         roleService.updateStatus(id, true);
     }
 
     @GetMapping("/roles/{id}/permissions")
-    @PreAuthorize("hasAuthority('system:role:list')")
+    @PreAuthorize("@perm.hasAuthority('system:role:list')")
     public List<BigInteger> getRolePermissions(@PathVariable BigInteger id) {
         return roleService.getRoleMenuIds(id);
     }
 
     @PutMapping("roles/{id}/permissions")
-    @PreAuthorize("hasAuthority('system:role:assign-perm')")
+    @PreAuthorize("@perm.hasAuthority('system:role:assign-permissions')")
     public void assignRolePermissions(@PathVariable BigInteger id, @RequestBody List<BigInteger> menuIds) {
         roleService.assignRoleMenus(id, menuIds);
     }

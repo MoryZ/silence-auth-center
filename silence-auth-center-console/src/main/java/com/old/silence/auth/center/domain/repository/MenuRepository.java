@@ -27,7 +27,23 @@ public interface MenuRepository {
      */
     Menu findById(BigInteger id);
 
-    List<Menu> findAllByDeleted(boolean deleted);
+    /**
+     * 查找所有启用且未删除的菜单列表
+     *
+     * @param deleted 是否删除
+     * @param status  是否启用
+     * @param types   菜单类型集合
+     * @return 菜单列表
+     */
+    List<Menu> findAllByDeletedAndStatusAndTypeIn(boolean deleted, boolean status, List<MenuType> types);
+     /**
+     * 根据查找子菜单列表
+     *
+     * @param deleted  是否删除
+     * @param status 是否启用
+     * @return 子菜单列表
+     */
+    List<Menu> findAllByDeletedAndStatus(boolean deleted, boolean status);
 
     /**
      * 创建新菜单
@@ -53,5 +69,5 @@ public interface MenuRepository {
     void delete(BigInteger id);
 
 
-    List<Menu> findByIdInAndDeletedAndTypeInAndStatus(List<BigInteger> menuIds, boolean deleted, List<MenuType> types, boolean status);
+    List<Menu> findByIdInAndDeletedAndStatus(List<BigInteger> menuIds, boolean deleted, boolean status);
 }

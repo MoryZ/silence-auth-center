@@ -41,13 +41,13 @@ public class UserResource {
     }
 
     @GetMapping("/users/{id}/roles")
-    @PreAuthorize("hasAuthority('system:user:list')")
+    @PreAuthorize("@perm.hasAuthority('system:user:list')")
     public List<BigInteger>getUserRoleIds(@PathVariable BigInteger id) {
         return userService.getUserRoleIds(id);
     }
 
     @GetMapping(value = "/users", params = {"pageNo", "pageSize"})
-    @PreAuthorize("hasAuthority('system:user:list')")
+    @PreAuthorize("@perm.hasAuthority('system:user:page')")
     public IPage<UserVo> query(Page<User> page, UserQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, User.class);
         var userPage = userService.query(page, queryWrapper);
@@ -55,52 +55,52 @@ public class UserResource {
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('system:user:list')")
+    @PreAuthorize("@perm.hasAuthority('system:user:list')")
     public User getUserById(@PathVariable BigInteger id) {
         return userService.findById(id);
     }
 
     @PostMapping("/users")
-    @PreAuthorize("hasAuthority('system:user:add')")
+    @PreAuthorize("@perm.hasAuthority('system:user:add')")
     public BigInteger create(@RequestBody UserCommand userCommand) {
         var user = userMapper.convert(userCommand);
         return userService.create(user); // NO SONAR
     }
 
     @PutMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('system:user:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void update(@PathVariable BigInteger id, @RequestBody UserCommand userCommand) {
         var user = userMapper.convert(userCommand);
         user.setId(id); //NO SONAR
         userService.update(user);
     }
     @PutMapping("/users/{id}/disable")
-    @PreAuthorize("hasAuthority('system:user:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void disable(@PathVariable BigInteger id) {
         userService.updateUserStatus(id, false);
     }
 
     @PutMapping("/users/{id}/enable")
-    @PreAuthorize("hasAuthority('system:user:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void enable(@PathVariable BigInteger id) {
         userService.updateUserStatus(id, true);
     }
 
     @PutMapping("/users/{id}/resetPassword")
-    @PreAuthorize("hasAuthority('system:user:reset-password')")
+    @PreAuthorize("@perm.hasAuthority('system:user:reset-password')")
     public void resetPassword(@PathVariable BigInteger id, @RequestBody @Validated UserPasswordCommand userPasswordCommand) {
         userService.resetPassword(id, userPasswordCommand.getNewPassword());
     }
 
 
     @PutMapping("/users/{id}/roles")
-    @PreAuthorize("hasAuthority('system:user:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void assignUserRoles(@PathVariable BigInteger id, @RequestBody @NotEmpty Set<BigInteger> roleIds) {
         userService.assignUserRoles(id, roleIds);
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasAuthority('system:user:delete')")
+    @PreAuthorize("@perm.hasAuthority('system:user:delete')")
     public void deleteUser(@PathVariable BigInteger id) {
         userService.delete(id);
     }

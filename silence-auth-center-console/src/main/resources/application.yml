@@ -10,9 +10,9 @@ spring:
   messages.basename: messages/silence_auth_center_messages
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
-    username: root
-    password: 123456
+    url: jdbc:mysql://www.silence-ci.com:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: silenceopr
+    password: -Dv09zr*^ck_7Q6A82
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: 30000

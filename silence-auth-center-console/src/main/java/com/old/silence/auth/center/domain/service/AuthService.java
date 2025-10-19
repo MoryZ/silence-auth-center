@@ -6,13 +6,23 @@ import com.old.silence.auth.center.api.assembler.UserMapper;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.domain.repository.UserRepository;
 import com.old.silence.auth.center.dto.LoginCommand;
+import com.old.silence.auth.center.dto.MenuDto;
+import com.old.silence.auth.center.enums.MenuType;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.security.SilenceAuthCenterRole;
 import com.old.silence.auth.center.security.SilenceAuthCenterServerTokenAuthority;
 import com.old.silence.auth.center.security.SilencePrincipal;
 import com.old.silence.auth.center.util.PasswordUtil;
 import com.old.silence.auth.center.vo.LoginVo;
+import com.old.silence.auth.center.vo.MenuVo;
 import com.old.silence.core.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -42,29 +52,58 @@ public class AuthService {
             throw AuthCenterMessages.USER_NOT_EXIST.createException();
         }
 
-        if (!"admin".equals(request.getUsername())) {
-            if (!passwordUtil.matches(request.getPassword(), user.getPassword())) {
-                throw AuthCenterMessages.PASSWORD_NOT_CORRECT.createException();
-            }
+        if (!passwordUtil.matches(request.getPassword(), user.getPassword())) {
+            throw AuthCenterMessages.PASSWORD_NOT_CORRECT.createException();
         }
+
+        List<MenuDto> currentUserMenuTree = menuService.getCurrentUserMenuTree(user.getId());
+        var permissions = flattenMenu(currentUserMenuTree);
+
 
         var roles = roleRepository.findRoleByUserId(user.getId());
         var principal = new SilencePrincipal(
-                CollectionUtils.transformToSet(roles, role -> new SilenceAuthCenterRole(role.getCode(), role.getName(), role.getAppCode())));
+                CollectionUtils.transformToSet(roles, role -> new SilenceAuthCenterRole(role.getCode(), role.getName(), role.getAppCode())),
+                permissions
+        );
         principal.setUsername(user.getUsername());
         principal.setCnName(user.getNickname());
         principal.setUserId(user.getId());
         // 生成token
         var token = silenceAuthCenterServerTokenAuthority.issueToken(principal);
 
-        var currentUserMenuTree = menuService.getCurrentUserMenuTree(user.getId());
-
         var userInfoVo = userMapper.toUserVo(user);
+        userInfoVo.setPermissions(permissions);
         var loginResponse = new LoginVo();
         loginResponse.setToken(token);
         loginResponse.setUserInfo(userInfoVo);
         loginResponse.setMenus(currentUserMenuTree);
         return loginResponse;
+    }
+
+    private Set<String> flattenMenu(List<MenuDto> currentUserMenuTree) {
+        return currentUserMenuTree.stream()
+                .flatMap(menu -> {
+                    List<MenuDto> result = new ArrayList<>();
+                    Stack<MenuDto> stack = new Stack<>();
+                    stack.push(menu);
+
+                    while (!stack.isEmpty()) {
+                        MenuDto current = stack.pop();
+                        result.add(current);
+
+                        // 将子节点逆序压入栈中，保持原有顺序
+                        if (current.getChildren() != null && !current.getChildren().isEmpty()) {
+                            for (int i = current.getChildren().size() - 1; i >= 0; i--) {
+                                stack.push(current.getChildren().get(i));
+                            }
+                        }
+                    }
+
+                    return result.stream();
+                })
+                .filter(menu -> menu.getType() == MenuType.BUTTON)
+                .map(menu -> (String) menu.getMeta().get("permission"))
+                .collect(Collectors.toSet());
     }
 
     public void logout() {

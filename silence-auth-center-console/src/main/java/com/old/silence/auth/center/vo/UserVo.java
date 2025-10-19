@@ -5,6 +5,7 @@ import com.old.silence.data.commons.domain.AuditableVo;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author moryzang
@@ -50,7 +51,7 @@ public class UserVo extends AuditableVo {
      */
     private List<BigInteger> roleIds;
 
-    private List<String> permissions;
+    private Set<String> permissions;
 
     public BigInteger getId() {
         return id;
@@ -116,11 +117,11 @@ public class UserVo extends AuditableVo {
         this.roleIds = roleIds;
     }
 
-    public List<String> getPermissions() {
+    public Set<String> getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(List<String> permissions) {
+    public void setPermissions(Set<String> permissions) {
         this.permissions = permissions;
     }
 }

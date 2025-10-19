@@ -1,5 +1,6 @@
 package com.old.silence.auth.center.api;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,45 +36,54 @@ public class NoticeResource {
     }
 
     @GetMapping(value = "/notices", params = {"pageNo", "pageSize"})
+    @PreAuthorize("@perm.hasAuthority('system:notice:page')")
     public Page<Notice> getNotices(Page<Notice> page, NoticeQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, Notice.class);
         return noticeRepository.query(page, queryWrapper);
     }
 
     @GetMapping(value = "/notices", params = {"!pageNo", "!pageSize", "status"})
+    @PreAuthorize("@perm.hasAuthority('system:notice:list')")
     public List<Notice> getNotices(@RequestParam NoticeStatus status) {
         return noticeRepository.getNoticesByStatus(status);
     }
-    
-    @PutMapping("/notices/{id}/read")
-    public void read(@PathVariable BigInteger id) {
-        noticeRepository.markAsRead(id);
-    }
-    
-    @PutMapping("/notices/readAll")
-    public void markAllAsRead() {
-        noticeRepository.markAllAsRead();
-    }
-    
-    @DeleteMapping("/notices/clear")
-    public void clearAllNotices() {
-        noticeRepository.clearAllNotices();
-    }
-    
+
     @PostMapping("/notices")
+    @PreAuthorize("@perm.hasAuthority('system:notice:add')")
     public void create(@RequestBody NoticeCommand noticeCommand) {
         var notice = noticeMapper.convert(noticeCommand);
         noticeRepository.create(notice);
     }
 
     @PutMapping("/notices/{id}")
+    @PreAuthorize("@perm.hasAuthority('system:notice:edit')")
     public void update(@PathVariable BigInteger id, @RequestBody NoticeCommand noticeCommand) {
         var notice = noticeMapper.convert(noticeCommand);
         notice.setId(id); //NO SONAR
         noticeRepository.update(notice);
     }
 
+    @PutMapping("/notices/{id}/read")
+    @PreAuthorize("@perm.hasAuthority('system:notice:read')")
+    public void read(@PathVariable BigInteger id) {
+        noticeRepository.markAsRead(id);
+    }
+
+    @PutMapping("/notices/readAll")
+    @PreAuthorize("@perm.hasAuthority('system:notice:readAll')")
+    public void markAllAsRead() {
+        noticeRepository.markAllAsRead();
+    }
+
+    @DeleteMapping("/notices/clear")
+    @PreAuthorize("@perm.hasAuthority('system:notice:clear')")
+    public void clearAllNotices() {
+        noticeRepository.clearAllNotices();
+    }
+
+
     @DeleteMapping("/notices/{id}")
+    @PreAuthorize("@perm.hasAuthority('system:notice:delete')")
     public void delete(@PathVariable BigInteger id) {
         noticeRepository.deleteById(id);
     }

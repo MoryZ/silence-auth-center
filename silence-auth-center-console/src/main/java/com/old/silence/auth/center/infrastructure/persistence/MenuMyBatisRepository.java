@@ -43,20 +43,30 @@ public class MenuMyBatisRepository implements MenuRepository {
     }
 
     @Override
-    public List<Menu> findAllByDeleted(boolean deleted) {
+    public List<Menu> findAllByDeletedAndStatus(boolean deleted, boolean status) {
         var queryWrapper = new LambdaQueryWrapper<Menu>()
-                .eq(Menu::getDeleted, 0)
+                .eq(Menu::getDeleted, deleted)
+                .eq(Menu::getStatus, status)
                 .orderByAsc(Menu::getSort);
 
         return menuDao.selectList(queryWrapper);
     }
 
     @Override
-    public List<Menu> findByIdInAndDeletedAndTypeInAndStatus(List<BigInteger> menuIds, boolean deleted, List<MenuType> types, boolean status) {
+    public List<Menu> findAllByDeletedAndStatusAndTypeIn(boolean deleted, boolean status, List<MenuType> types) {
+        var queryWrapper = new LambdaQueryWrapper<Menu>()
+                .in(Menu::getType, types)
+                .eq(Menu::getDeleted, deleted)
+                .eq(Menu::getStatus, status)
+                .orderByAsc(Menu::getSort);
+        return menuDao.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Menu> findByIdInAndDeletedAndStatus(List<BigInteger> menuIds, boolean deleted, boolean status) {
         var queryWrapper = new LambdaQueryWrapper<Menu>()
                 .in(Menu::getId, menuIds)
                 .eq(Menu::getDeleted, deleted)
-                .in(Menu::getType, types)
                 .eq(Menu::getStatus, status)
                 .orderByAsc(Menu::getSort);
         return menuDao.selectList(queryWrapper);

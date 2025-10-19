@@ -1,6 +1,5 @@
 package com.old.silence.auth.center.domain.service;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,22 +20,22 @@ import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class MenuService {
 
     private final MenuRepository menuRepository;
+    private final MenuMapper menuMapper;
     private final RoleMenuRepository roleMenuRepository;
     private final UserRoleRepository userRoleRepository;
 
-    public MenuService(MenuRepository menuRepository, RoleMenuRepository roleMenuRepository,
-                       UserRoleRepository userRoleRepository) {
+    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper,
+                       RoleMenuRepository roleMenuRepository, UserRoleRepository userRoleRepository) {
         this.menuRepository = menuRepository;
+        this.menuMapper = menuMapper;
         this.roleMenuRepository = roleMenuRepository;
         this.userRoleRepository = userRoleRepository;
     }
@@ -47,7 +46,7 @@ public class MenuService {
 
     public List<TreeDto> getMenuTree() {
         // 获取所有菜单列表
-        List<Menu> menus = menuRepository.findAllByDeleted(false);
+        List<Menu> menus = menuRepository.findAllByDeletedAndStatus(false, true);
         var treeDTOS = CollectionUtils.transformToList(menus, node -> new TreeDto(node.getId(), node.getName(), node.getParentId()));
 
 
@@ -57,7 +56,7 @@ public class MenuService {
 
     public List<MenuDto> getMenuList() {
         // 获取所有菜单列表
-        var menus = menuRepository.findAllByDeleted(false);
+        var menus = menuRepository.findAllByDeletedAndStatusAndTypeIn(false, true, List.of(MenuType.CONTENTS, MenuType.MENU));
         // 转换为树形结构
         return buildMenuTree(menus);
     }
@@ -139,9 +138,7 @@ public class MenuService {
         List<Menu> menus;
         //如果是超管，返回所有资源
         if (BigInteger.ONE.compareTo(userId) == 0) {
-            menus = menuRepository.findAllByDeleted(false)
-                    .stream().filter(menu -> Set.of(MenuType.CONTENTS, MenuType.MENU).contains(menu.getType()) && menu.getStatus())
-                    .collect(Collectors.toList());
+            menus = menuRepository.findAllByDeletedAndStatus(false, true);
         } else {
             // 获取用户角色ID列表
             List<BigInteger> roleIds = userRoleRepository.findByUserId(userId)
@@ -159,7 +156,7 @@ public class MenuService {
             }
 
             // 获取权限标识列表
-            menus = menuRepository.findByIdInAndDeletedAndTypeInAndStatus(menuIds, false, List.of(MenuType.CONTENTS, MenuType.MENU), true);
+            menus = menuRepository.findByIdInAndDeletedAndStatus(menuIds, false, true);
 
         }
         return menus;
@@ -169,8 +166,7 @@ public class MenuService {
 
 
     private List<MenuDto> buildMenuTree(List<Menu> menus) {
-        var menuMapper = Mappers.getMapper(MenuMapper.class);
-        var menuDtos = menus.stream().map(menuMapper::convertToDto).collect(Collectors.toList());
+        var menuDtos = menus.stream().map(menuMapper::convertToDto).toList();
         // 构建父子关系
         Map<BigInteger, List<MenuDto>> parentMap = menuDtos.stream()
                 .collect(Collectors.groupingBy(MenuDto::getParentId));
