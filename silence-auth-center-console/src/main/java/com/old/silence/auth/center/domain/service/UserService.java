@@ -157,7 +157,7 @@ public class UserService {
                         userRole.setRoleId(roleId);
                         return userRole;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             userRoles.forEach(userRoleDao::insert);
         }
     }

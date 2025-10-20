@@ -9,7 +9,6 @@ import java.math.BigInteger;
 public class NoticeCommand {
 
 
-
     /**
      * 发送者ID
      */

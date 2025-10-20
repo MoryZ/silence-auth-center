@@ -15,6 +15,7 @@ import com.old.silence.auth.center.security.SilencePrincipal;
 import com.old.silence.auth.center.util.PasswordUtil;
 import com.old.silence.auth.center.vo.LoginVo;
 import com.old.silence.auth.center.vo.MenuVo;
+import com.old.silence.core.context.CommonErrors;
 import com.old.silence.core.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -46,8 +47,9 @@ public class AuthService {
     }
 
     public LoginVo login(LoginCommand request) {
+        throw CommonErrors.SERVICE_UNAVAILABLE.createException();
 
-        var user = userRepository.findByUsernameAndStatus(request.getUsername(), true);
+        /*var user = userRepository.findByUsernameAndStatus(request.getUsername(), true);
         if (user == null) {
             throw AuthCenterMessages.USER_NOT_EXIST.createException();
         }
@@ -77,7 +79,7 @@ public class AuthService {
         loginResponse.setToken(token);
         loginResponse.setUserInfo(userInfoVo);
         loginResponse.setMenus(currentUserMenuTree);
-        return loginResponse;
+        return loginResponse;*/
     }
 
     private Set<String> flattenMenu(List<MenuDto> currentUserMenuTree) {
