@@ -23,10 +23,6 @@ spring:
       pool-name: silence_auth_center_pool
       max-lifetime: 1800000
   cloud:
-    openfeign:
-      autoconfiguration:
-        jackson:
-          enabled: false
     nacos:
       discovery:
         server-addr: http://www.silence-ci.com:8848
