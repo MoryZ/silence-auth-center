@@ -1,3 +1,8 @@
+logging:
+  level:
+    root: info
+    '[com.old.silence.auth.center]': info
+
 server:
   port: 8096
 
