@@ -2,6 +2,10 @@ package com.old.silence.auth.center.api;
 
 import jakarta.validation.constraints.NotEmpty;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,11 +27,6 @@ import com.old.silence.auth.center.dto.UserQuery;
 import com.old.silence.auth.center.vo.UserVo;
 import com.old.silence.data.commons.converter.QueryWrapperConverter;
 
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-
 @RestController
 @RequestMapping("/api/v1")
 public class UserResource {
@@ -42,7 +41,7 @@ public class UserResource {
 
     @GetMapping("/users/{id}/roles")
     @PreAuthorize("@perm.hasAuthority('system:user:list')")
-    public List<BigInteger>getUserRoleIds(@PathVariable BigInteger id) {
+    public List<BigInteger> getUserRoleIds(@PathVariable BigInteger id) {
         return userService.getUserRoleIds(id);
     }
 
@@ -74,6 +73,7 @@ public class UserResource {
         user.setId(id); //NO SONAR
         userService.update(user);
     }
+
     @PutMapping("/users/{id}/disable")
     @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void disable(@PathVariable BigInteger id) {

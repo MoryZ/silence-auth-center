@@ -1,12 +1,12 @@
 package com.old.silence.auth.center.dto;
 
 
-import com.old.silence.auth.center.enums.MenuType;
-import com.old.silence.auth.center.enums.ModuleType;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+
+import com.old.silence.auth.center.enums.MenuType;
+import com.old.silence.auth.center.enums.ModuleType;
 
 public class MenuDto {
     /**

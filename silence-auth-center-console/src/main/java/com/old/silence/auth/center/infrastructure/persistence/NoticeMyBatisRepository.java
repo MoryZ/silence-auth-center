@@ -1,15 +1,15 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.enums.NoticeStatus;
 import com.old.silence.auth.center.domain.model.Notice;
 import com.old.silence.auth.center.domain.repository.NoticeRepository;
+import com.old.silence.auth.center.enums.NoticeStatus;
 import com.old.silence.auth.center.infrastructure.persistence.dao.NoticeDao;
-
-import java.math.BigInteger;
-import java.util.List;
 
 
 /**
@@ -54,7 +54,7 @@ public class NoticeMyBatisRepository implements NoticeRepository {
 
     @Override
     public int markAsRead(BigInteger noticeId) {
-        return noticeDao.updateStatus(NoticeStatus.READ ,noticeId);
+        return noticeDao.updateStatus(NoticeStatus.READ, noticeId);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class NoticeMyBatisRepository implements NoticeRepository {
 
     @Override
     public void clearAllNotices() {
-        noticeDao.deleteAll( null);
+        noticeDao.deleteAll(null);
     }
 
 }

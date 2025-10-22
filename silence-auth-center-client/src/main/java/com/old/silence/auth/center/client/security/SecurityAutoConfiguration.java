@@ -2,7 +2,6 @@ package com.old.silence.auth.center.client.security;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -11,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,7 +21,7 @@ import com.old.silence.core.condition.ConditionOnPropertyPrefix;
 
 @AutoConfiguration
 @ConditionOnPropertyPrefix("silence.auth.center.security.api")
-public class SecurityAutoConfiguration  {
+public class SecurityAutoConfiguration {
 
     @Value("${silence.auth.center.security.api.white-list:}")
     private String[] whiteListApi;
@@ -33,7 +31,7 @@ public class SecurityAutoConfiguration  {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // 禁用 CSRF（适用于无状态 API，如 JWT 认证）
                 .csrf(AbstractHttpConfigurer::disable)
@@ -69,7 +67,7 @@ public class SecurityAutoConfiguration  {
         return http.build();
     }
 
-    private TokenFilter tokenFilter(){
+    private TokenFilter tokenFilter() {
         var tokenAuthority = new TokenAuthority();
         return new TokenFilter(tokenAuthority);
     }

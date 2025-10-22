@@ -1,17 +1,17 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.enums.MenuType;
 import com.old.silence.auth.center.domain.model.Menu;
 import com.old.silence.auth.center.domain.repository.MenuRepository;
+import com.old.silence.auth.center.enums.MenuType;
 import com.old.silence.auth.center.infrastructure.persistence.dao.MenuDao;
 import com.old.silence.auth.center.infrastructure.persistence.dao.RoleMenuDao;
-
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @author moryzang

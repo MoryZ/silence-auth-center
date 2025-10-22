@@ -1,11 +1,11 @@
 package com.old.silence.auth.center.vo;
 
 
-import com.old.silence.data.commons.domain.AuditableVo;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
+
+import com.old.silence.data.commons.domain.AuditableVo;
 
 /**
  * @author moryzang

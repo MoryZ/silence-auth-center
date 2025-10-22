@@ -1,11 +1,11 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+
 import org.springframework.stereotype.Repository;
 import com.old.silence.auth.center.domain.model.User;
 import com.old.silence.auth.center.domain.repository.UserRepository;
 import com.old.silence.auth.center.infrastructure.persistence.dao.UserDao;
-
-import java.math.BigInteger;
 
 /**
  * @author moryzang
@@ -22,7 +22,6 @@ public class UserMyBatisRepository implements UserRepository {
     public User findById(BigInteger id) {
         return userDao.selectById(id);
     }
-
 
 
     @Override

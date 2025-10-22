@@ -1,9 +1,9 @@
 package com.old.silence.auth.center.domain.repository;
 
 
-import com.old.silence.auth.center.domain.model.User;
-
 import java.math.BigInteger;
+
+import com.old.silence.auth.center.domain.model.User;
 
 /**
  * @author moryzang
@@ -25,10 +25,11 @@ public interface UserRepository {
      * 根据用户ID查找用户
      *
      * @param username 用户名
-     * @param status 状态
+     * @param status   状态
      * @return User 对象
      */
     User findByUsernameAndStatus(String username, Boolean status);
+
     /**
      * 创建新用户
      *
@@ -55,12 +56,11 @@ public interface UserRepository {
     /**
      * 更新用户的密码
      *
-     * @param id   用户ID
+     * @param id       用户ID
      * @param password 新密码
      * @return 更新后的User对象
      */
     int updatePassword(BigInteger id, String password);
-
 
 
 }

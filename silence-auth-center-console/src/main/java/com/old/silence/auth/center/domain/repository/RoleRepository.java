@@ -1,12 +1,12 @@
 package com.old.silence.auth.center.domain.repository;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.domain.model.Role;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.old.silence.auth.center.domain.model.Role;
 
 /**
  * @author moryzang
@@ -17,7 +17,8 @@ public interface RoleRepository {
     boolean existsByCodeAndDeleted(String code, boolean deleted);
 
     Set<Role> findRoleByUserId(BigInteger userId);
-     /**
+
+    /**
      * 查询所有角色
      *
      * @param page 分页信息

@@ -1,13 +1,12 @@
 package com.old.silence.auth.center.domain.service;
 
+import java.util.Arrays;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import com.old.silence.auth.center.security.SilenceAuthCenterContextHolder;
 import com.old.silence.core.util.CollectionUtils;
-
-import java.util.Arrays;
 
 /**
  * @author moryzang

@@ -1,17 +1,16 @@
 package com.old.silence.auth.center.domain.repository;
 
 
-import com.old.silence.auth.center.domain.model.UserRole;
-
 import java.math.BigInteger;
 import java.util.List;
+
+import com.old.silence.auth.center.domain.model.UserRole;
 
 /**
  * @author moryzang
  */
 
 public interface UserRoleRepository {
-
 
 
     /**
@@ -21,6 +20,7 @@ public interface UserRoleRepository {
      * @return UserRole 对象
      */
     List<UserRole> findByUserId(BigInteger userId);
+
     /**
      * 创建新用户
      *
@@ -36,8 +36,6 @@ public interface UserRoleRepository {
      * @param userId 用户ID
      */
     int deleteByUserId(BigInteger userId);
-
-
 
 
 }

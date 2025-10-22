@@ -11,6 +11,7 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 
 public class TokenAuthority implements SilenceAuthCenterTokenAuthority {
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenAuthority.class);
+
     @Override
     public String issueToken(SilencePrincipal principal) {
         return null;
@@ -22,10 +23,10 @@ public class TokenAuthority implements SilenceAuthCenterTokenAuthority {
         JWTVerifier verifier = JWT.require(algorithm).build();
         try {
             verifier.verify(token);
-        }catch (JWTDecodeException | SignatureVerificationException e){
+        } catch (JWTDecodeException | SignatureVerificationException e) {
             LOGGER.error(e.getLocalizedMessage());
             return false;
-        }catch (TokenExpiredException ex){
+        } catch (TokenExpiredException ex) {
             LOGGER.warn(ex.getLocalizedMessage());
             return false;
         }

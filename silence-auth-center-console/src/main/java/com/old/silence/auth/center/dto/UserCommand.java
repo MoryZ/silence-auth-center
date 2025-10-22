@@ -4,10 +4,10 @@ package com.old.silence.auth.center.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import com.old.silence.validation.group.OnlyOnCreationValidation;
-
 import java.math.BigInteger;
 import java.util.List;
+
+import com.old.silence.validation.group.OnlyOnCreationValidation;
 
 public class UserCommand {
     /**

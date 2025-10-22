@@ -1,12 +1,12 @@
 package com.old.silence.auth.center.domain.repository;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.enums.MenuType;
-import com.old.silence.auth.center.domain.model.Menu;
-
 import java.math.BigInteger;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.old.silence.auth.center.domain.model.Menu;
+import com.old.silence.auth.center.enums.MenuType;
 
 /**
  * @author moryzang
@@ -36,11 +36,12 @@ public interface MenuRepository {
      * @return 菜单列表
      */
     List<Menu> findAllByDeletedAndStatusAndTypeIn(boolean deleted, boolean status, List<MenuType> types);
-     /**
+
+    /**
      * 根据查找子菜单列表
      *
-     * @param deleted  是否删除
-     * @param status 是否启用
+     * @param deleted 是否删除
+     * @param status  是否启用
      * @return 子菜单列表
      */
     List<Menu> findAllByDeletedAndStatus(boolean deleted, boolean status);

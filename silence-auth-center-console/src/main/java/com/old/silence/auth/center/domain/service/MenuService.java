@@ -1,13 +1,15 @@
 package com.old.silence.auth.center.domain.service;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.enums.MenuType;
-import com.old.silence.core.util.CollectionUtils;
-import com.old.silence.core.util.TreeFormatUtils;
-import com.old.silence.dto.TreeDto;
 import com.old.silence.auth.center.api.assembler.MenuMapper;
 import com.old.silence.auth.center.domain.model.Menu;
 import com.old.silence.auth.center.domain.model.RoleMenu;
@@ -16,13 +18,11 @@ import com.old.silence.auth.center.domain.repository.MenuRepository;
 import com.old.silence.auth.center.domain.repository.RoleMenuRepository;
 import com.old.silence.auth.center.domain.repository.UserRoleRepository;
 import com.old.silence.auth.center.dto.MenuDto;
+import com.old.silence.auth.center.enums.MenuType;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.old.silence.core.util.CollectionUtils;
+import com.old.silence.core.util.TreeFormatUtils;
+import com.old.silence.dto.TreeDto;
 
 @Service
 public class MenuService {
@@ -63,13 +63,13 @@ public class MenuService {
 
     public Menu findById(BigInteger id) {
         Menu menu = menuRepository.findById(id);
-        if (menu == null || menu.getDeleted() ) {
+        if (menu == null || menu.getDeleted()) {
             throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
         }
         return menu;
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public BigInteger create(Menu menu) {
         // 创建菜单
@@ -78,12 +78,12 @@ public class MenuService {
         return menu.getId();
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public void update(Menu menu) {
         // 检查菜单是否存在
         Menu existingMenu = menuRepository.findById(menu.getId());
-        if (existingMenu == null || existingMenu.getDeleted() ) {
+        if (existingMenu == null || existingMenu.getDeleted()) {
             throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
         }
 
@@ -91,14 +91,14 @@ public class MenuService {
         menuRepository.update(menu);
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public void delete(BigInteger id) {
 
         menuRepository.delete(id);
         // 检查菜单是否存在
         Menu menu = menuRepository.findById(id);
-        if (menu == null || menu.getDeleted() ) {
+        if (menu == null || menu.getDeleted()) {
             throw AuthCenterMessages.MENU_NOT_EXIST.createException();
         }
 
@@ -117,7 +117,7 @@ public class MenuService {
     public void updateMenuStatus(BigInteger id, Boolean status) {
         // 检查菜单是否存在
         Menu menu = menuRepository.findById(id);
-        if (menu == null || menu.getDeleted() ) {
+        if (menu == null || menu.getDeleted()) {
             throw AuthCenterMessages.MENU_NOT_EXIST.createException();
         }
 
@@ -126,13 +126,13 @@ public class MenuService {
         menuRepository.update(menu);
     }
 
-    
+
     public List<MenuDto> getCurrentUserMenuTree(BigInteger userId) {
-        var menus =  getCurrentUserMenus(userId);
+        var menus = getCurrentUserMenus(userId);
         return buildMenuTree(menus);
     }
 
-    
+
     public List<Menu> getCurrentUserMenus(BigInteger userId) {
 
         List<Menu> menus;
@@ -177,7 +177,6 @@ public class MenuService {
         // 返回顶层菜单
         return parentMap.getOrDefault(BigInteger.ZERO, new ArrayList<>());
     }
-
 
 
 }

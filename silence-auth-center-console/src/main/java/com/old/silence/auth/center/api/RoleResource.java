@@ -1,5 +1,8 @@
 package com.old.silence.auth.center.api;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,16 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.data.commons.converter.QueryWrapperConverter;
 import com.old.silence.auth.center.api.assembler.RoleMapper;
 import com.old.silence.auth.center.domain.model.Role;
 import com.old.silence.auth.center.domain.service.RoleService;
 import com.old.silence.auth.center.dto.RoleCommand;
 import com.old.silence.auth.center.dto.RoleQuery;
 import com.old.silence.auth.center.vo.RoleVo;
-
-import java.math.BigInteger;
-import java.util.List;
+import com.old.silence.data.commons.converter.QueryWrapperConverter;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -36,7 +36,7 @@ public class RoleResource {
 
     @GetMapping(value = "/roles", params = {"pageNo", "pageSize"})
     @PreAuthorize("@perm.hasAuthority('system:role:page')")
-    public Page<Role> queryPage(Page<Role> page,RoleQuery query) {
+    public Page<Role> queryPage(Page<Role> page, RoleQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, Role.class);
         return roleService.queryPage(page, queryWrapper);
     }

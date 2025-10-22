@@ -7,10 +7,10 @@ import com.old.silence.core.enums.DescribedEnumValue;
  */
 public enum ModuleType implements DescribedEnumValue<String> {
 
-    SYSTEM("SYSTEM","系统模块"),
-    CONFIG("CONFIG","配置中心CC"),
-    MQ("MQ","消息队列SilenceMQ"),
-    JOB("JOB","任务调度SilenceJob"),
+    SYSTEM("SYSTEM", "系统模块"),
+    CONFIG("CONFIG", "配置中心CC"),
+    MQ("MQ", "消息队列SilenceMQ"),
+    JOB("JOB", "任务调度SilenceJob"),
     ;
 
     private final String value;

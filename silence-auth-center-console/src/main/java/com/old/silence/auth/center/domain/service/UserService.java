@@ -1,5 +1,10 @@
 package com.old.silence.auth.center.domain.service;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -13,11 +18,6 @@ import com.old.silence.auth.center.infrastructure.persistence.dao.UserDao;
 import com.old.silence.auth.center.infrastructure.persistence.dao.UserRoleDao;
 import com.old.silence.auth.center.util.PasswordUtil;
 import com.old.silence.core.util.CollectionUtils;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -53,12 +53,12 @@ public class UserService {
         return userPage;
     }
 
-    
+
     public User findById(BigInteger id) {
         return userDao.selectById(id);
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public BigInteger create(User user) {
         // 密码强度验证
@@ -116,13 +116,13 @@ public class UserService {
                 .eq(UserRole::getUserId, id));
     }
 
-    
+
     public void updateUserStatus(BigInteger id, Boolean status) {
         userDao.update(new UpdateWrapper<User>().lambda().set(User::getStatus, status)
                 .eq(User::getId, id));
     }
 
-    
+
     public void resetPassword(BigInteger id, String password) {
 
         validatePasswordStrength(password);
@@ -132,16 +132,16 @@ public class UserService {
                 .eq(User::getId, id));
     }
 
-    
+
     public List<BigInteger> getUserRoleIds(BigInteger userId) {
         return userRoleDao.selectList(new LambdaQueryWrapper<UserRole>()
-                .eq(UserRole::getUserId, userId))
+                        .eq(UserRole::getUserId, userId))
                 .stream()
                 .map(UserRole::getRoleId)
                 .collect(Collectors.toList());
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public void assignUserRoles(BigInteger userId, Set<BigInteger> roleIds) {
         // 删除原有角色

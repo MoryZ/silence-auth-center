@@ -43,9 +43,9 @@ public class SilenceAuthCenterGrantedAuthority implements GrantedAuthority {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj){
+        if (this == obj) {
             return true;
-        }else {
+        } else {
 
             return obj instanceof SilenceAuthCenterGrantedAuthority &&
                     this.roleCode.equals(((SilenceAuthCenterGrantedAuthority) obj).roleCode);

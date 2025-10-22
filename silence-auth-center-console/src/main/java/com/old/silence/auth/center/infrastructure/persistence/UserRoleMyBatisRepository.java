@@ -1,12 +1,12 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import com.old.silence.auth.center.domain.model.UserRole;
 import com.old.silence.auth.center.domain.repository.UserRoleRepository;
 import com.old.silence.auth.center.infrastructure.persistence.dao.UserRoleDao;
-
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @author moryzang
@@ -28,7 +28,6 @@ public class UserRoleMyBatisRepository implements UserRoleRepository {
     public int bulkCreate(List<UserRole> userRoles) {
         return userRoleDao.insertBatchSomeColumn(userRoles);
     }
-
 
 
     @Override

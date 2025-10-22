@@ -1,5 +1,11 @@
 package com.old.silence.auth.center.domain.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.old.silence.auth.center.api.assembler.UserMapper;
@@ -14,16 +20,7 @@ import com.old.silence.auth.center.security.SilenceAuthCenterServerTokenAuthorit
 import com.old.silence.auth.center.security.SilencePrincipal;
 import com.old.silence.auth.center.util.PasswordUtil;
 import com.old.silence.auth.center.vo.LoginVo;
-import com.old.silence.auth.center.vo.MenuVo;
-import com.old.silence.core.context.CommonErrors;
 import com.old.silence.core.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Service

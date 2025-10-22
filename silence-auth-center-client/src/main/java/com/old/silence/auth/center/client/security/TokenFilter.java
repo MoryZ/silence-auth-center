@@ -5,6 +5,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,11 +24,6 @@ import com.old.silence.auth.center.security.SilenceAuthCenterTokenAuthority;
 import com.old.silence.auth.center.security.SilencePrincipal;
 import com.old.silence.json.JacksonMapper;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 public class TokenFilter extends OncePerRequestFilter {
 
     private final SilenceAuthCenterTokenAuthority tokenAuthority;
@@ -36,10 +35,10 @@ public class TokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         var token = getToken(request);
-        if(StringUtils.hasText(token) && tokenAuthority.verifyToken(token)){
+        if (StringUtils.hasText(token) && tokenAuthority.verifyToken(token)) {
             String subject = tokenAuthority.getSubject(token);
             var jacksonMapper = JacksonMapper.getSharedInstance();
-            if(jacksonMapper.validateJson(subject)){
+            if (jacksonMapper.validateJson(subject)) {
                 var principal = jacksonMapper.fromJson(subject, SilencePrincipal.class);
                 var authorities = principal.getRoles()
                         .stream()
@@ -56,7 +55,7 @@ public class TokenFilter extends OncePerRequestFilter {
 
     private String getToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader == null || !authorizationHeader.startsWith(SecurityConstants.TOKEN_PREFIX)){
+        if (authorizationHeader == null || !authorizationHeader.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             return null;
         }
         return authorizationHeader.replace(SecurityConstants.TOKEN_PREFIX, "");

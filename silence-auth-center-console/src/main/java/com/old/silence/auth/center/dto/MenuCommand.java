@@ -1,14 +1,14 @@
 package com.old.silence.auth.center.dto;
 
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
-
-import com.old.silence.auth.center.enums.MenuType;
-import com.old.silence.auth.center.enums.ModuleType;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigInteger;
 import java.util.Map;
+
+import com.old.silence.auth.center.enums.MenuType;
+import com.old.silence.auth.center.enums.ModuleType;
 
 public class MenuCommand {
 
@@ -63,7 +63,6 @@ public class MenuCommand {
      */
     @NotNull
     private Long sort;
-
 
 
     public BigInteger getParentId() {

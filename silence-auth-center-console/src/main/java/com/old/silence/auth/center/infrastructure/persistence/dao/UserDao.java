@@ -1,12 +1,12 @@
 package com.old.silence.auth.center.infrastructure.persistence.dao;
 
+import java.math.BigInteger;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.old.silence.auth.center.domain.model.User;
-
-import java.math.BigInteger;
 
 @Mapper
 public interface UserDao extends BaseMapper<User> {
