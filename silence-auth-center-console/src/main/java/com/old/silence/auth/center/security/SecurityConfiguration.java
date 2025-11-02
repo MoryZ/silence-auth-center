@@ -43,6 +43,9 @@ public class SecurityConfiguration {
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         // 公开接口
+                        .requestMatchers("/api/v1//users/modifyPassword").permitAll()
+                        .requestMatchers("/api/v1/users/{id}/resetPassword").permitAll()
+                        .requestMatchers("/api/v1/users/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/logout").permitAll()
                         .requestMatchers("/api/v1/captcha/image").permitAll()

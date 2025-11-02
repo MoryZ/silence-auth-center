@@ -37,6 +37,11 @@
 
         <dependency>
             <groupId>com.old.silence</groupId>
+            <artifactId>platform-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.old.silence</groupId>
             <artifactId>platform-web</artifactId>
         </dependency>
 

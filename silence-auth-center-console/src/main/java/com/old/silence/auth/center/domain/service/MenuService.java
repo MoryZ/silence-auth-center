@@ -146,6 +146,10 @@ public class MenuService {
                     .map(UserRole::getRoleId)
                     .collect(Collectors.toList());
 
+            if (CollectionUtils.isEmpty(roleIds)) {
+                return List.of();
+            }
+
             // 获取角色菜单ID列表
             List<BigInteger> menuIds = roleMenuRepository.findByRoleIdIn(roleIds)
                     .stream()

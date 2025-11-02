@@ -3,21 +3,13 @@ logging:
     root: info
     '[com.old.silence.auth.center]': info
 
-server:
-  port: 8096
 
 spring:
-  servlet:
-    multipart:
-      max-file-size: 50MB
-      max-request-size: 60MB
-  application.name: auth-service
-  messages.basename: messages/silence_auth_center_messages
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
-    password: admin123456
+    password: 123456
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: 30000
@@ -55,6 +47,3 @@ spring:
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
 
-platform:
-  system:
-    identifier: AC

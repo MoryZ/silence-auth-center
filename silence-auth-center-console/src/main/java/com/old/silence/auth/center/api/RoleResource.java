@@ -47,6 +47,11 @@ public class RoleResource {
         return roleService.listAllRoles();
     }
 
+    @GetMapping(path = "/roles/minimum")
+    public List<RoleVo> minimumRoles() {
+        return roleService.minimumRoles();
+    }
+
     @GetMapping("/roles/{id}")
     @PreAuthorize("@perm.hasAuthority('system:role:list')")
     public Role findById(@PathVariable BigInteger id) {

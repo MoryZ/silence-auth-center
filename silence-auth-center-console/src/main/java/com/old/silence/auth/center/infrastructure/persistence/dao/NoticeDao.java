@@ -14,10 +14,10 @@ import com.old.silence.auth.center.enums.NoticeStatus;
 @Mapper
 public interface NoticeDao extends BaseMapper<Notice> {
 
-    @Update("update notice set status = #{noticeStatus.value} where id = #{id} ")
+    @Update("update notice set status = #{noticeStatus} where id = #{id} ")
     int updateStatus(NoticeStatus noticeStatus, BigInteger id);
 
-    @Update("update notice set status = #{noticeStatus.value} where status = 1 and created_by = #{createdBy} ")
+    @Update("update notice set status = #{noticeStatus} where status = 0 and created_by = #{createdBy} ")
     int updateAllStatus(NoticeStatus noticeStatus, String createdBy);
 
     @Delete("delete from notice where created_by = #{createdBy} ")

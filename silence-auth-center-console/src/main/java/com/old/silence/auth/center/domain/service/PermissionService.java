@@ -1,7 +1,9 @@
 package com.old.silence.auth.center.domain.service;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,9 @@ import com.old.silence.core.util.CollectionUtils;
  */
 @Service("perm")
 public class PermissionService {
+
+    @Value("${app.super-admin.usernames:admin,root,administrator}")
+    private List<String> superAdminUsernames;
 
     /**
      * 检查用户是否有任意一个权限（超级管理员自动通过）
@@ -47,7 +52,7 @@ public class PermissionService {
      * 判断是否是超级管理员
      */
     private boolean isSuperAdmin(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        String username = authentication.getName();
+        return superAdminUsernames.contains(username.toLowerCase());
     }
 }

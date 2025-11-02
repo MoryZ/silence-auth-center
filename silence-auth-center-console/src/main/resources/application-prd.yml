@@ -2,11 +2,9 @@ server:
   port: 8096
 
 spring:
-  application:
-    name: auth-service
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://115.190.196.117:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: silenceopr
     password: 520loveTmx@#
     type: com.zaxxer.hikari.HikariDataSource
@@ -45,8 +43,3 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
-
-
-platform:
-  system:
-    identifier: AC

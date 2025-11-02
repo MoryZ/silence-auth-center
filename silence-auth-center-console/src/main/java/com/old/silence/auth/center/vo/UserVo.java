@@ -45,6 +45,10 @@ public class UserVo extends AuditableVo {
      */
     private String phone;
 
+    private Boolean isFirstLogin;
+
+    private Boolean isForceChangePassword;
+
 
     /**
      * 角色ID列表
@@ -107,6 +111,22 @@ public class UserVo extends AuditableVo {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public Boolean getFirstLogin() {
+        return isFirstLogin;
+    }
+
+    public void setFirstLogin(Boolean firstLogin) {
+        isFirstLogin = firstLogin;
+    }
+
+    public Boolean getForceChangePassword() {
+        return isForceChangePassword;
+    }
+
+    public void setForceChangePassword(Boolean forceChangePassword) {
+        isForceChangePassword = forceChangePassword;
     }
 
     public List<BigInteger> getRoleIds() {

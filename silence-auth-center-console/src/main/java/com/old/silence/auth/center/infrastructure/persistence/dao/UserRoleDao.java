@@ -1,6 +1,7 @@
 package com.old.silence.auth.center.infrastructure.persistence.dao;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Delete;
@@ -27,5 +28,5 @@ public interface UserRoleDao extends BaseMapper<UserRole> {
             "</foreach>",
             "</script>"
     })
-    List<UserRole> findByUserIdIn(List<BigInteger> userIds);
+    List<UserRole> findByUserIdIn(Collection<BigInteger> userIds);
 }

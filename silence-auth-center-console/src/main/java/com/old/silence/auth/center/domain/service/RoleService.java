@@ -33,6 +33,14 @@ public class RoleService {
         return roleRepository.query(page, queryWrapper);
     }
 
+    public List<RoleVo> minimumRoles() {
+        List<Role> roles = roleRepository.findByStatusAndDeleted(true, false);
+        return roles.stream()
+                .filter(role -> !"ROLE_ADMIN".equals(role.getCode()))
+                .map(this::enhanceRole)
+                .collect(Collectors.toList());
+    }
+
 
     public List<RoleVo> listAllRoles() {
         List<Role> roles = roleRepository.findByStatusAndDeleted(true, false);
@@ -142,6 +150,7 @@ public class RoleService {
         });
         roleMenuRepository.bulkInsert(roleMenus);
     }
+
 
 
 }

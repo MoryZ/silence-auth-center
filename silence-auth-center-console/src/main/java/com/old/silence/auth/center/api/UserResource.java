@@ -21,8 +21,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.api.assembler.UserMapper;
 import com.old.silence.auth.center.domain.model.User;
 import com.old.silence.auth.center.domain.service.UserService;
+import com.old.silence.auth.center.dto.ModifyUserPasswordCommand;
 import com.old.silence.auth.center.dto.UserCommand;
-import com.old.silence.auth.center.dto.UserPasswordCommand;
+import com.old.silence.auth.center.dto.ResetUserPasswordCommand;
 import com.old.silence.auth.center.dto.UserQuery;
 import com.old.silence.auth.center.vo.UserVo;
 import com.old.silence.data.commons.converter.QueryWrapperConverter;
@@ -66,6 +67,12 @@ public class UserResource {
         return userService.create(user); // NO SONAR
     }
 
+    @PostMapping("/users/register")
+    public BigInteger register(@RequestBody UserCommand userCommand) {
+        var user = userMapper.convert(userCommand);
+        return userService.register(user); // NO SONAR
+    }
+
     @PutMapping("/users/{id}")
     @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void update(@PathVariable BigInteger id, @RequestBody UserCommand userCommand) {
@@ -87,11 +94,14 @@ public class UserResource {
     }
 
     @PutMapping("/users/{id}/resetPassword")
-    @PreAuthorize("@perm.hasAuthority('system:user:reset-password')")
-    public void resetPassword(@PathVariable BigInteger id, @RequestBody @Validated UserPasswordCommand userPasswordCommand) {
-        userService.resetPassword(id, userPasswordCommand.getNewPassword());
+    public void resetPassword(@PathVariable BigInteger id, @RequestBody @Validated ResetUserPasswordCommand resetUserPasswordCommand) {
+        userService.resetPassword(id, resetUserPasswordCommand.getNewPassword());
     }
 
+    @PutMapping("/users/modifyPassword")
+    public void modifyPassword(@RequestBody @Validated ModifyUserPasswordCommand modifyUserPasswordCommand) {
+        userService.modifyPassword(modifyUserPasswordCommand.getUsername(), modifyUserPasswordCommand.getNewPassword());
+    }
 
     @PutMapping("/users/{id}/roles")
     @PreAuthorize("@perm.hasAuthority('system:user:edit')")
