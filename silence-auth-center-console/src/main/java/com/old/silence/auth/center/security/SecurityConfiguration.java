@@ -49,6 +49,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/logout").permitAll()
                         .requestMatchers("/api/v1/captcha/image").permitAll()
+                        .requestMatchers("/api/v1/health").permitAll()
                         // 所有其他请求需要认证
                         .anyRequest().authenticated()
                 );
