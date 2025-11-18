@@ -1,5 +1,7 @@
 package com.old.silence.auth.center.util;
 
+import java.util.Arrays;
+
 /**
  * @author moryzang
  */
@@ -9,21 +11,19 @@ public final class Base64Utils {
         throw new AssertionError();
     }
 
-    static private final int BASELENGTH = 128;
-    static private final int LOOKUPLENGTH = 64;
-    static private final int TWENTYFOURBITGROUP = 24;
-    static private final int EIGHTBIT = 8;
-    static private final int SIXTEENBIT = 16;
-    static private final int FOURBYTE = 4;
+    static private final int BASE_LENGTH = 128;
+    static private final int LOOKUP_LENGTH = 64;
+    static private final int TWENTY_FOUR_BIT_GROUP = 24;
+    static private final int EIGHT_BIT = 8;
+    static private final int SIXTEEN_BIT = 16;
+    static private final int FOUR_BYTE = 4;
     static private final int SIGN = -128;
     static private final char PAD = '=';
-    static final private byte[] base64Alphabet = new byte[BASELENGTH];
-    static final private char[] lookUpBase64Alphabet = new char[LOOKUPLENGTH];
+    static final private byte[] base64Alphabet = new byte[BASE_LENGTH];
+    static final private char[] lookUpBase64Alphabet = new char[LOOKUP_LENGTH];
 
     static {
-        for (int i = 0; i < BASELENGTH; ++i) {
-            base64Alphabet[i] = -1;
-        }
+        Arrays.fill(base64Alphabet, (byte) -1);
         for (int i = 'Z'; i >= 'A'; i--) {
             base64Alphabet[i] = (byte) (i - 'A');
         }
@@ -49,8 +49,8 @@ public final class Base64Utils {
         for (int i = 52, j = 0; i <= 61; i++, j++) {
             lookUpBase64Alphabet[i] = (char) ('0' + j);
         }
-        lookUpBase64Alphabet[62] = (char) '+';
-        lookUpBase64Alphabet[63] = (char) '/';
+        lookUpBase64Alphabet[62] = '+';
+        lookUpBase64Alphabet[63] = '/';
     }
 
     private static boolean isWhiteSpace(char octect) {
@@ -61,8 +61,8 @@ public final class Base64Utils {
         return (octect == PAD);
     }
 
-    private static boolean isData(char octect) {
-        return (octect < BASELENGTH && base64Alphabet[octect] != -1);
+    private static boolean isNotData(char octect) {
+        return (octect >= BASE_LENGTH || base64Alphabet[octect] == -1);
     }
 
     /**
@@ -76,19 +76,19 @@ public final class Base64Utils {
             return null;
         }
 
-        int lengthDataBits = binaryData.length * EIGHTBIT;
+        int lengthDataBits = binaryData.length * EIGHT_BIT;
         if (lengthDataBits == 0) {
             return "";
         }
 
-        int fewerThan24bits = lengthDataBits % TWENTYFOURBITGROUP;
-        int numberTriplets = lengthDataBits / TWENTYFOURBITGROUP;
+        int fewerThan24bits = lengthDataBits % TWENTY_FOUR_BIT_GROUP;
+        int numberTriplets = lengthDataBits / TWENTY_FOUR_BIT_GROUP;
         int numberQuartet = fewerThan24bits != 0 ? numberTriplets + 1 : numberTriplets;
-        char encodedData[] = null;
+        char[] encodedData;
 
         encodedData = new char[numberQuartet * 4];
 
-        byte k = 0, l = 0, b1 = 0, b2 = 0, b3 = 0;
+        byte k, l, b1, b2, b3;
 
         int encodedIndex = 0;
         int dataIndex = 0;
@@ -112,7 +112,7 @@ public final class Base64Utils {
         }
 
         // form integral number of 6-bit groups
-        if (fewerThan24bits == EIGHTBIT) {
+        if (fewerThan24bits == EIGHT_BIT) {
             b1 = binaryData[dataIndex];
             k = (byte) (b1 & 0x03);
             byte val1 = ((b1 & SIGN) == 0) ? (byte) (b1 >> 2) : (byte) ((b1) >> 2 ^ 0xc0);
@@ -120,7 +120,7 @@ public final class Base64Utils {
             encodedData[encodedIndex++] = lookUpBase64Alphabet[k << 4];
             encodedData[encodedIndex++] = PAD;
             encodedData[encodedIndex++] = PAD;
-        } else if (fewerThan24bits == SIXTEENBIT) {
+        } else if (fewerThan24bits == SIXTEEN_BIT) {
             b1 = binaryData[dataIndex];
             b2 = binaryData[dataIndex + 1];
             l = (byte) (b2 & 0x0f);
@@ -152,19 +152,19 @@ public final class Base64Utils {
         // remove white spaces
         int len = removeWhiteSpace(base64Data);
 
-        if (len % FOURBYTE != 0) {
+        if (len % FOUR_BYTE != 0) {
             return null;// should be divisible by four
         }
 
-        int numberQuadruple = (len / FOURBYTE);
+        int numberQuadruple = (len / FOUR_BYTE);
 
         if (numberQuadruple == 0) {
             return new byte[0];
         }
 
-        byte decodedData[] = null;
-        byte b1 = 0, b2 = 0, b3 = 0, b4 = 0;
-        char d1 = 0, d2 = 0, d3 = 0, d4 = 0;
+        byte[] decodedData;
+        byte b1, b2, b3, b4;
+        char d1, d2, d3, d4;
 
         int i = 0;
         int encodedIndex = 0;
@@ -173,8 +173,8 @@ public final class Base64Utils {
 
         for (; i < numberQuadruple - 1; i++) {
 
-            if (!isData((d1 = base64Data[dataIndex++])) || !isData((d2 = base64Data[dataIndex++]))
-                    || !isData((d3 = base64Data[dataIndex++])) || !isData((d4 = base64Data[dataIndex++]))) {
+            if (isNotData((d1 = base64Data[dataIndex++])) || isNotData((d2 = base64Data[dataIndex++]))
+                    || isNotData((d3 = base64Data[dataIndex++])) || isNotData((d4 = base64Data[dataIndex++]))) {
                 return null;
             } // if found "no data" just return null
 
@@ -188,7 +188,7 @@ public final class Base64Utils {
             decodedData[encodedIndex++] = (byte) (b3 << 6 | b4);
         }
 
-        if (!isData((d1 = base64Data[dataIndex++])) || !isData((d2 = base64Data[dataIndex++]))) {
+        if (isNotData((d1 = base64Data[dataIndex++])) || isNotData((d2 = base64Data[dataIndex++]))) {
             return null;// if found "no data" just return null
         }
 
@@ -197,7 +197,7 @@ public final class Base64Utils {
 
         d3 = base64Data[dataIndex++];
         d4 = base64Data[dataIndex++];
-        if (!isData((d3)) || !isData((d4))) {// Check if they are PAD characters
+        if (isNotData((d3)) || isNotData((d4))) {// Check if they are PAD characters
             if (isPad(d3) && isPad(d4)) {
                 if ((b2 & 0xf) != 0)// last 4 bits should be zero
                 {

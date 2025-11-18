@@ -106,7 +106,7 @@ public class RoleMyBatisRepository implements RoleRepository {
                         roleMenu.setMenuId(menuId);
                         return roleMenu;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             roleMenus.forEach(roleMenuDao::insert);
         }
     }
