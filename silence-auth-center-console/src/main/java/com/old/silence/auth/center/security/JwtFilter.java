@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import com.old.silence.auth.center.domain.service.UserService;
+import com.old.silence.auth.center.security.exception.TokenVerificationException;
 import com.old.silence.core.util.CollectionUtils;
 import com.old.silence.json.JacksonMapper;
 
@@ -41,27 +42,31 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws
             ServletException, IOException {
-        var tokenOptional = getToken(request);
-        if (tokenOptional.isPresent() && jwtProvider.verifyToken(tokenOptional.get())) {
-            var token = tokenOptional.get();
-            String subject = jwtProvider.getSubject(token);
-            if (jacksonMapper.validateJson(subject)) {
-                var principal = jacksonMapper.fromJson(subject, SilencePrincipal.class);
-                var username = principal.getUsername();
+        try {
+            var tokenOptional = getToken(request);
+            if (tokenOptional.isPresent() && jwtProvider.verifyToken(tokenOptional.get())) {
+                var token = tokenOptional.get();
+                String subject = jwtProvider.getSubject(token);
+                if (jacksonMapper.validateJson(subject)) {
+                    var principal = jacksonMapper.fromJson(subject, SilencePrincipal.class);
+                    var username = principal.getUsername();
 
-                if (userService.existsByUsername(username)) {
-                    var authorities = CollectionUtils.transformToList(
-                            principal.getRoles(), silenceAuthCenterRole -> new SilenceAuthCenterGrantedAuthority(silenceAuthCenterRole.getRoleCode(), silenceAuthCenterRole.getRoleName(),
-                                    silenceAuthCenterRole.getAppCode()));
+                    if (userService.existsByUsername(username)) {
+                        var authorities = CollectionUtils.transformToList(
+                                principal.getRoles(), silenceAuthCenterRole -> new SilenceAuthCenterGrantedAuthority(silenceAuthCenterRole.getRoleCode(), silenceAuthCenterRole.getRoleName(),
+                                        silenceAuthCenterRole.getAppCode()));
 
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(
-                            principal, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                                principal, null, authorities);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             }
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        } catch (TokenVerificationException ex) {
+            response.setStatus(ex.getStatusCode());
+        }
     }
 
     private Optional<String> getToken(HttpServletRequest request) {

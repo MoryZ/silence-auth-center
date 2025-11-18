@@ -15,6 +15,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.old.silence.auth.center.security.exception.TokenVerificationException;
 import com.old.silence.json.JacksonMapper;
 
 /**
@@ -35,23 +36,6 @@ public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterT
 
     public SilenceAuthCenterServerTokenAuthority(JacksonMapper jacksonMapper) {
         this.jacksonMapper = jacksonMapper;
-    }
-
-    public String issueToken(String username) {
-        Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
-        Map<String, Object> headerClaims = new HashMap<>();
-        headerClaims.put("alg", algorithm.getName());
-        headerClaims.put("typ", SecurityConstants.TOKEN_TYPE);
-
-        Instant now = Instant.now();
-        return JWT.create()
-                .withHeader(headerClaims)
-                .withSubject(username)
-                .withIssuer(SecurityConstants.TOKEN_ISSUER)
-                .withAudience(SecurityConstants.TOKEN_AUDIENCE)
-                .withIssuedAt(now)
-                .withExpiresAt(now.plusSeconds(jwtExpirationSeconds))
-                .sign(algorithm);
     }
 
     @Override
@@ -78,14 +62,14 @@ public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterT
         JWTVerifier verifier = JWT.require(algorithm).build();
         try {
             verifier.verify(token);
+            return true;
         } catch (JWTDecodeException | SignatureVerificationException ex) {
             LOGGER.error("verify token failed:{}", ex.getLocalizedMessage());
-            return false;
+            throw new TokenVerificationException(401, "token is invalid", ex);
         } catch (TokenExpiredException ex) {
             LOGGER.warn("The token is expired:{}", token);
-            return false;
+            throw new TokenVerificationException(403, "token is expired", ex);
         }
-        return true;
     }
 
     @Override

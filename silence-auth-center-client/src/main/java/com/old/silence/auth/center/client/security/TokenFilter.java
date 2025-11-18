@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import com.old.silence.auth.center.security.exception.TokenVerificationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,23 +35,28 @@ public class TokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        var token = getToken(request);
-        if (StringUtils.hasText(token) && tokenAuthority.verifyToken(token)) {
-            String subject = tokenAuthority.getSubject(token);
-            var jacksonMapper = JacksonMapper.getSharedInstance();
-            if (jacksonMapper.validateJson(subject)) {
-                var principal = jacksonMapper.fromJson(subject, SilencePrincipal.class);
-                var authorities = principal.getRoles()
-                        .stream()
-                        .map(roleDto -> new SilenceAuthCenterGrantedAuthority(roleDto.getRoleCode(), roleDto.getRoleName(), roleDto.getAppCode()))
-                        .collect(Collectors.toCollection(() -> new ArrayList<GrantedAuthority>()));
-                Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
         ContentCachingResponseWrapper wrapper = new ContentCachingResponseWrapper(response);
-        filterChain.doFilter(request, wrapper);
-        wrapper.copyBodyToResponse();
+        try {
+            var token = getToken(request);
+            if (StringUtils.hasText(token) && tokenAuthority.verifyToken(token)) {
+                String subject = tokenAuthority.getSubject(token);
+                var jacksonMapper = JacksonMapper.getSharedInstance();
+                if (jacksonMapper.validateJson(subject)) {
+                    var principal = jacksonMapper.fromJson(subject, SilencePrincipal.class);
+                    var authorities = principal.getRoles()
+                            .stream()
+                            .map(roleDto -> new SilenceAuthCenterGrantedAuthority(roleDto.getRoleCode(), roleDto.getRoleName(), roleDto.getAppCode()))
+                            .collect(Collectors.toCollection(() -> new ArrayList<GrantedAuthority>()));
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+            filterChain.doFilter(request, wrapper);
+        } catch (TokenVerificationException ex) {
+            wrapper.setStatus(ex.getStatusCode());
+        } finally {
+            wrapper.copyBodyToResponse();
+        }
     }
 
     private String getToken(HttpServletRequest request) {

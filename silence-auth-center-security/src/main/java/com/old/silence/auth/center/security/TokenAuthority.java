@@ -1,16 +1,19 @@
 package com.old.silence.auth.center.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.old.silence.auth.center.security.exception.TokenVerificationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TokenAuthority implements SilenceAuthCenterTokenAuthority {
     private static final Logger LOGGER = LoggerFactory.getLogger(TokenAuthority.class);
+    private static final int STATUS_UNAUTHORIZED = 401;
+    private static final int STATUS_FORBIDDEN = 403;
 
     @Override
     public String issueToken(SilencePrincipal principal) {
@@ -23,14 +26,14 @@ public class TokenAuthority implements SilenceAuthCenterTokenAuthority {
         JWTVerifier verifier = JWT.require(algorithm).build();
         try {
             verifier.verify(token);
-        } catch (JWTDecodeException | SignatureVerificationException e) {
-            LOGGER.error(e.getLocalizedMessage());
-            return false;
+            return true;
+        } catch (JWTDecodeException | SignatureVerificationException ex) {
+            LOGGER.error("Token verification failed: {}", ex.getLocalizedMessage());
+            throw new TokenVerificationException(STATUS_UNAUTHORIZED, "token is invalid", ex);
         } catch (TokenExpiredException ex) {
-            LOGGER.warn(ex.getLocalizedMessage());
-            return false;
+            LOGGER.warn("Token expired: {}", ex.getLocalizedMessage());
+            throw new TokenVerificationException(STATUS_FORBIDDEN, "token is expired", ex);
         }
-        return true;
     }
 
     @Override

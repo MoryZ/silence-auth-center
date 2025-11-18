@@ -5,10 +5,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -16,6 +12,11 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.old.silence.json.JacksonMapper;
+import com.old.silence.auth.center.security.exception.TokenVerificationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterTokenAuthority {
@@ -69,14 +70,14 @@ public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterT
         JWTVerifier verifier = JWT.require(algorithm).build();
         try {
             verifier.verify(token);
+            return true;
         } catch (JWTDecodeException | SignatureVerificationException ex) {
             LOGGER.error("verify token failed:{}", ex.getLocalizedMessage());
-            return false;
+            throw new TokenVerificationException(401, "token is invalid", ex);
         } catch (TokenExpiredException ex) {
             LOGGER.warn("The token is expired:{}", token);
-            return false;
+            throw new TokenVerificationException(403, "token is expired", ex);
         }
-        return true;
     }
 
     @Override
