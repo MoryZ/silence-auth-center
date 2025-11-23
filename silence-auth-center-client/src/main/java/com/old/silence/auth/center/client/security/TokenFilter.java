@@ -61,10 +61,19 @@ public class TokenFilter extends OncePerRequestFilter {
                     return;
                 }
             }
-            // 继续执行过滤器链，让请求到达 Controller 或 AuthenticationEntryPoint
+            // 继续执行过滤器链，让请求到达 Controller
+            // 注意：这里不捕获业务异常，让异常继续传播到 Spring MVC 的异常处理器
             filterChain.doFilter(request, wrapper);
-        } finally {
             wrapper.copyBodyToResponse();
+        } catch (TokenVerificationException ex) {
+            // 只捕获 Token 验证异常，其他异常继续传播
+            wrapper.setStatus(ex.getStatusCode());
+            wrapper.copyBodyToResponse();
+        } catch (Exception ex) {
+            // 其他异常（包括业务异常）继续传播，不在这里处理
+            // 这样 Spring MVC 的全局异常处理器可以处理这些异常
+            wrapper.copyBodyToResponse();
+            throw ex;
         }
     }
 

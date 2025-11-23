@@ -32,7 +32,7 @@ public class NotFoundAwareAuthenticationEntryPoint implements AuthenticationEntr
         try {
             // 检查请求路径是否匹配任何已注册的处理器
             // 注意：这里只检查处理器映射，不实际执行处理器
-            // 如果接口存在，会找到对应的 HandlerExecutionChain；如果不存在，则找不到
+            // AuthenticationEntryPoint 只会在认证失败时被调用，此时请求还没有到达 Controller
             Optional<HandlerExecutionChain> handler = handlerMappingIntrospector.getHandlerMappings()
                     .stream()
                     .map(mapping -> {

@@ -62,8 +62,13 @@ public class SecurityAutoConfiguration {
                 })
                 // 始终添加 Token 过滤器（因为认证始终启用）
                 .addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        // 使用自定义的认证入口点，区分接口不存在（404）和认证失败（401）
-        http.exceptionHandling(e -> e.authenticationEntryPoint(new NotFoundAwareAuthenticationEntryPoint(handlerMappingIntrospector)));
+        // 配置异常处理：只处理认证/授权异常，其他异常继续传播到 Spring MVC 的异常处理器
+        http.exceptionHandling(e -> {
+            // 使用自定义的认证入口点，区分接口不存在（404）和认证失败（401）
+            e.authenticationEntryPoint(new NotFoundAwareAuthenticationEntryPoint(handlerMappingIntrospector));
+            // 注意：这里不配置 accessDeniedHandler，让 AccessDeniedException 也继续传播
+            // 这样业务异常（如 SQL 异常）不会被 Security 拦截，而是由 Spring MVC 的全局异常处理器处理
+        });
         return http.build();
     }
 
