@@ -1,12 +1,7 @@
 package com.old.silence.auth.center.client.security;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -17,13 +12,10 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.servlet.HandlerExecutionChain;
-import org.springframework.web.servlet.HandlerMapping;
 import com.old.silence.auth.center.security.TokenAuthority;
 import com.old.silence.core.condition.ConditionOnPropertyPrefix;
 
@@ -37,14 +29,9 @@ public class SecurityAutoConfiguration {
     @Value("${silence.auth.center.security.api.enable:true}")
     private boolean enable;
 
-    @Bean
-    public SmartAuthenticationEntryPoint smartAuthenticationEntryPoint(List<HandlerMapping> handlerMappings) {
-        return new SmartAuthenticationEntryPoint(handlerMappings);
-    }
-
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, SmartAuthenticationEntryPoint smartAuthenticationEntryPoint) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // 禁用 CSRF（适用于无状态 API，如 JWT 认证）
                 .csrf(AbstractHttpConfigurer::disable)
@@ -76,7 +63,7 @@ public class SecurityAutoConfiguration {
                 })
                 // 始终添加 Token 过滤器（因为认证始终启用）
                 .addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.exceptionHandling(e -> e.authenticationEntryPoint(smartAuthenticationEntryPoint));
+        http.exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
         return http.build();
     }
 
