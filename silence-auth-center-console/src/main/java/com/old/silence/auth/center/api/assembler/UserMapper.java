@@ -1,6 +1,5 @@
 package com.old.silence.auth.center.api.assembler;
 
-import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 import com.old.silence.auth.center.domain.model.User;

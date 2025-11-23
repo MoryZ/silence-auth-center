@@ -3,7 +3,6 @@ package com.old.silence.auth.center.infrastructure.persistence;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
