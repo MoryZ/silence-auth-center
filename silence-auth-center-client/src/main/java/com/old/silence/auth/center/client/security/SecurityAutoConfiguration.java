@@ -6,16 +6,15 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 import com.old.silence.auth.center.security.TokenAuthority;
 import com.old.silence.core.condition.ConditionOnPropertyPrefix;
 
@@ -31,7 +30,7 @@ public class SecurityAutoConfiguration {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector handlerMappingIntrospector) throws Exception {
         http
                 // 禁用 CSRF（适用于无状态 API，如 JWT 认证）
                 .csrf(AbstractHttpConfigurer::disable)
@@ -63,7 +62,8 @@ public class SecurityAutoConfiguration {
                 })
                 // 始终添加 Token 过滤器（因为认证始终启用）
                 .addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+        // 使用自定义的认证入口点，区分接口不存在（404）和认证失败（401）
+        http.exceptionHandling(e -> e.authenticationEntryPoint(new NotFoundAwareAuthenticationEntryPoint(handlerMappingIntrospector)));
         return http.build();
     }
 
