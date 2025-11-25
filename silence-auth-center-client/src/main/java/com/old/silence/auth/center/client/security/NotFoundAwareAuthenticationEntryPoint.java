@@ -8,6 +8,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -42,7 +43,7 @@ public class NotFoundAwareAuthenticationEntryPoint implements AuthenticationEntr
                             return null;
                         }
                     })
-                    .filter(h -> h != null)
+                    .filter(Objects::nonNull)
                     .findFirst();
 
             // 如果找不到匹配的处理器，说明接口不存在，返回 404
