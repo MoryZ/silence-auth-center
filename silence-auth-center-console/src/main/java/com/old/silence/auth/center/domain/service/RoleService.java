@@ -1,5 +1,10 @@
 package com.old.silence.auth.center.domain.service;
 
+import java.math.BigInteger;
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,12 +17,6 @@ import com.old.silence.auth.center.domain.repository.RoleMenuRepository;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.vo.RoleVo;
-
-import java.math.BigInteger;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RoleService {
@@ -34,7 +33,15 @@ public class RoleService {
         return roleRepository.query(page, queryWrapper);
     }
 
-    
+    public List<RoleVo> minimumRoles() {
+        List<Role> roles = roleRepository.findByStatusAndDeleted(true, false);
+        return roles.stream()
+                .filter(role -> !"ROLE_ADMIN".equals(role.getCode()))
+                .map(this::enhanceRole)
+                .collect(Collectors.toList());
+    }
+
+
     public List<RoleVo> listAllRoles() {
         List<Role> roles = roleRepository.findByStatusAndDeleted(true, false);
 
@@ -43,12 +50,12 @@ public class RoleService {
                 .collect(Collectors.toList());
     }
 
-    
+
     public Role findById(BigInteger id) {
         return getRole(id);
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public BigInteger create(Role role) {
         // 检查角色编码是否已存在
@@ -60,7 +67,7 @@ public class RoleService {
         return role.getId();
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public void update(Role role) {
         // 检查角色是否存在
@@ -75,7 +82,7 @@ public class RoleService {
         roleRepository.update(role);
     }
 
-    
+
     @Transactional(rollbackFor = Exception.class)
     public void delete(BigInteger id) {
         // 检查角色是否存在
@@ -87,7 +94,7 @@ public class RoleService {
 
     }
 
-    
+
     private Role getRole(BigInteger id) {
         // 检查角色是否存在
         Role role = roleRepository.findById(id);
@@ -107,7 +114,7 @@ public class RoleService {
 
     }
 
-    
+
     public List<BigInteger> getRoleMenuIds(BigInteger roleId) {
         return roleMenuRepository.findByRoleId(roleId).stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
     }
@@ -144,5 +151,6 @@ public class RoleService {
         roleMenuRepository.bulkInsert(roleMenus);
     }
 
-   
+
+
 }

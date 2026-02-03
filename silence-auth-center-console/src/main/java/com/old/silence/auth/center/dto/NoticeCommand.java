@@ -1,13 +1,11 @@
 package com.old.silence.auth.center.dto;
 
 
+import java.math.BigInteger;
 
 import com.old.silence.auth.center.enums.NoticeStatus;
 
-import java.math.BigInteger;
-
 public class NoticeCommand {
-
 
 
     /**

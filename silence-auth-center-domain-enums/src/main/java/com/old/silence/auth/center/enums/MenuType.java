@@ -8,11 +8,11 @@ import com.old.silence.core.enums.DescribedEnumValue;
 public enum MenuType implements DescribedEnumValue<Byte> {
 
 
-    CONTENTS(1,"目录"),
+    CONTENTS(1, "目录"),
 
-    MENU(2,"菜单"),
+    MENU(2, "菜单"),
 
-    BUTTON(3,"按钮"),
+    BUTTON(3, "按钮"),
     ;
 
     private final Byte value;

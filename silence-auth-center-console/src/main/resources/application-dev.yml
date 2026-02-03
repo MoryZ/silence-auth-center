@@ -1,15 +1,12 @@
-server:
-  port: 8096
+logging:
+  level:
+    root: info
+    '[com.old.silence.auth.center]': info
+
 
 spring:
-  servlet:
-    multipart:
-      max-file-size: 50MB
-      max-request-size: 60MB
-  application.name: auth-service
-  messages.basename: messages/silence_auth_center_messages
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: 123456
@@ -25,10 +22,10 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: http://localhost:8848
+        server-addr: localhost:8848
         username: nacos
         password: nacos
-  redis:
+  data.redis:
     # 主机
     host: 127.0.0.1
     # 数据库
@@ -50,23 +47,3 @@ spring:
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
 
-mybatis-plus:
-  configuration:
-    # 开启驼峰命名映射
-    map-underscore-to-camel-case: true
-    # 日志输出 SQL
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-    default-enum-type-handler: com.old.silence.data.commons.handler.GenericEnumTypeHandler
-  global-config:
-    db-config:
-      # 全局主键类型（可选）
-      id-type: auto
-      # 逻辑删除字段（可选）
-      logic-delete-field: is_deleted
-      logic-not-delete-value: 0
-      logic-delete-value: 1
-  type-handlers-package: com.old.silence.data.commons.handler
-
-platform:
-  system:
-    identifier: AC

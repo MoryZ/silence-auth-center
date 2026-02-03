@@ -1,7 +1,7 @@
 package com.old.silence.auth.center.dto;
 
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class LoginCommand {
     /**
@@ -15,6 +15,7 @@ public class LoginCommand {
      */
     @NotBlank(message = "密码不能为空")
     private String password;
+
 
     public String getUsername() {
         return username;

@@ -1,9 +1,9 @@
 package com.old.silence.auth.center.util;
 
+import java.security.SecureRandom;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.security.SecureRandom;
 
 /**
  * @author moryzang

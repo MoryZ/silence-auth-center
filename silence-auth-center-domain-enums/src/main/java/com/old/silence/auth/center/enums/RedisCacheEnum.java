@@ -7,7 +7,7 @@ import com.old.silence.core.enums.DescribedEnumValue;
  */
 public enum RedisCacheEnum implements DescribedEnumValue<String> {
 
-    PWD_ERR_CNT_KEY("password:error:retry:","密码错误可重试次数"),
+    PWD_ERR_CNT_KEY("password:error:retry:", "密码错误可重试次数"),
     CAPTCHA_CODE_KEY("captcha_codes:", "验证码");
     private final String value;
     private final String description;
@@ -17,7 +17,7 @@ public enum RedisCacheEnum implements DescribedEnumValue<String> {
         this.description = description;
     }
 
-    public String getCacheKey(String suffix){
+    public String getCacheKey(String suffix) {
 
         return this.getValue() + suffix;
     }

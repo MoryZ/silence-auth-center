@@ -1,15 +1,17 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.enums.NoticeStatus;
 import com.old.silence.auth.center.domain.model.Notice;
 import com.old.silence.auth.center.domain.repository.NoticeRepository;
+import com.old.silence.auth.center.enums.NoticeStatus;
+import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.infrastructure.persistence.dao.NoticeDao;
-
-import java.math.BigInteger;
-import java.util.List;
+import com.old.silence.auth.center.security.SilenceAuthCenterContextHolder;
 
 
 /**
@@ -48,23 +50,30 @@ public class NoticeMyBatisRepository implements NoticeRepository {
     @Override
     public List<Notice> getNoticesByStatus(NoticeStatus status) {
         var queryWrapper = new QueryWrapper<Notice>();
-        queryWrapper.eq("status", status);
+
+        var username = SilenceAuthCenterContextHolder.getAuthenticatedUserName()
+                .orElseThrow(AuthCenterMessages.USER_NOT_EXIST::createException);
+        queryWrapper.lambda()
+                .eq(Notice::getStatus, status)
+                .eq(Notice::getSenderName, username);
         return noticeDao.selectList(queryWrapper);
     }
 
     @Override
     public int markAsRead(BigInteger noticeId) {
-        return noticeDao.updateStatus(NoticeStatus.READ ,noticeId);
+        return noticeDao.updateStatus(NoticeStatus.READ, noticeId);
     }
 
     @Override
     public void markAllAsRead() {
-        noticeDao.updateAllStatus(NoticeStatus.READ, null);
+        var username = SilenceAuthCenterContextHolder.getAuthenticatedUserName().orElseThrow(AuthCenterMessages.USER_NOT_EXIST::createException);
+        noticeDao.updateAllStatus(NoticeStatus.READ, username);
     }
 
     @Override
     public void clearAllNotices() {
-        noticeDao.deleteAll( null);
+        var username = SilenceAuthCenterContextHolder.getAuthenticatedUserName().orElseThrow(AuthCenterMessages.USER_NOT_EXIST::createException);
+        noticeDao.deleteAll(username);
     }
 
 }

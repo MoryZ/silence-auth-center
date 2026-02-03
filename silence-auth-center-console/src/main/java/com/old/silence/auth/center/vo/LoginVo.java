@@ -1,9 +1,9 @@
 package com.old.silence.auth.center.vo;
 
 
-import com.old.silence.auth.center.dto.MenuDto;
-
 import java.util.List;
+
+import com.old.silence.auth.center.dto.MenuDto;
 
 public class LoginVo {
     /**

@@ -1,12 +1,14 @@
 package com.old.silence.auth.center.dto;
 
 
-import com.old.silence.auth.center.enums.MenuType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
 import java.util.Map;
+
+import com.old.silence.auth.center.enums.MenuType;
+import com.old.silence.auth.center.enums.ModuleType;
 
 public class MenuCommand {
 
@@ -28,6 +30,12 @@ public class MenuCommand {
      */
     @NotNull
     private MenuType type;
+
+    /**
+     * 菜单所属模块：SYSTEM-系统，CONFIG-配置中心，MQ-消息队列，JOB-任务调度
+     */
+    @NotNull
+    private ModuleType moduleType;
 
 
     /**
@@ -56,10 +64,6 @@ public class MenuCommand {
     @NotNull
     private Long sort;
 
-    /**
-     * 状态：0-禁用，1-启用
-     */
-    private Boolean status;
 
     public BigInteger getParentId() {
         return parentId;
@@ -79,6 +83,14 @@ public class MenuCommand {
 
     public MenuType getType() {
         return type;
+    }
+
+    public ModuleType getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(ModuleType moduleType) {
+        this.moduleType = moduleType;
     }
 
     public void setType(MenuType type) {
@@ -125,11 +137,4 @@ public class MenuCommand {
         this.sort = sort;
     }
 
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
 }

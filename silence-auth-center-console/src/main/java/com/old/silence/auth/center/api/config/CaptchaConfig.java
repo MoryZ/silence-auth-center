@@ -1,13 +1,9 @@
 package com.old.silence.auth.center.api.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import com.google.code.kaptcha.impl.DefaultKaptcha;
-import com.google.code.kaptcha.util.Config;
-
 import java.util.Properties;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import static com.google.code.kaptcha.Constants.KAPTCHA_BORDER;
 import static com.google.code.kaptcha.Constants.KAPTCHA_BORDER_COLOR;
 import static com.google.code.kaptcha.Constants.KAPTCHA_IMAGE_HEIGHT;
@@ -22,6 +18,8 @@ import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_FONT_COLOR;
 import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_FONT_NAMES;
 import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_FONT_SIZE;
 import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_IMPL;
+import com.google.code.kaptcha.impl.DefaultKaptcha;
+import com.google.code.kaptcha.util.Config;
 
 /**
  * @author moryzang
@@ -33,8 +31,7 @@ public class CaptchaConfig {
      *
      */
     @Bean(name = "captchaProducer")
-    public DefaultKaptcha getKaptchaBean()
-    {
+    public DefaultKaptcha getKaptchaBean() {
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no

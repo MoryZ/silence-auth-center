@@ -1,5 +1,9 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -10,11 +14,6 @@ import com.old.silence.auth.center.domain.model.RoleMenu;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.infrastructure.persistence.dao.RoleDao;
 import com.old.silence.auth.center.infrastructure.persistence.dao.RoleMenuDao;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author moryzang
@@ -106,7 +105,7 @@ public class RoleMyBatisRepository implements RoleRepository {
                         roleMenu.setMenuId(menuId);
                         return roleMenu;
                     })
-                    .collect(Collectors.toList());
+                    .toList();
             roleMenus.forEach(roleMenuDao::insert);
         }
     }

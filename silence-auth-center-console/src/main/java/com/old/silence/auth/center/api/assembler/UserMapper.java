@@ -1,6 +1,5 @@
 package com.old.silence.auth.center.api.assembler;
 
-import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 import com.old.silence.auth.center.domain.model.User;
@@ -15,7 +14,7 @@ import com.old.silence.core.mapstruct.MapStructSpringConfig;
 @Mapper(uses = MapStructSpringConfig.class)
 public interface UserMapper extends Converter<UserCommand, User> {
 
-    User convert(@NotNull UserCommand userCommand);
+    User convert(UserCommand userCommand);
 
     UserVo toUserVo(User user);
 

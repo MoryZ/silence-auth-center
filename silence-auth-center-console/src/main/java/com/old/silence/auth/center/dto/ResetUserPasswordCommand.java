@@ -1,10 +1,11 @@
 package com.old.silence.auth.center.dto;
 
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-public class UserPasswordCommand {
+
+public class ResetUserPasswordCommand {
 
 
     @NotBlank

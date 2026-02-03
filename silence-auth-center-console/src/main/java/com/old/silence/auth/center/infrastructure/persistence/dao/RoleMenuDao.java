@@ -1,13 +1,13 @@
 package com.old.silence.auth.center.infrastructure.persistence.dao;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.old.silence.auth.center.domain.model.RoleMenu;
-
-import java.math.BigInteger;
-import java.util.List;
 
 @Mapper
 public interface RoleMenuDao extends BaseMapper<RoleMenu> {

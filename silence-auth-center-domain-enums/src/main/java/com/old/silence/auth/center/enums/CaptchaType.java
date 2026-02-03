@@ -8,9 +8,9 @@ import com.old.silence.core.enums.DescribedEnumValue;
 public enum CaptchaType implements DescribedEnumValue<Byte> {
 
 
-    MATH(1,"数字"),
+    MATH(1, "数字"),
 
-    CHAR(2,"字符串"),
+    CHAR(2, "字符串"),
     ;
 
     private final Byte value;

@@ -1,12 +1,11 @@
 package com.old.silence.auth.center.vo;
 
 
-
-import com.old.silence.auth.center.enums.MenuType;
-
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+
+import com.old.silence.auth.center.enums.MenuType;
 
 public class MenuVo {
     /**

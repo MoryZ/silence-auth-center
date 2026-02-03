@@ -1,14 +1,14 @@
 package com.old.silence.auth.center.security;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.CollectionUtils;
-
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.CollectionUtils;
 
 public class SilenceAuthCenterContextHolder {
 
@@ -86,6 +86,18 @@ public class SilenceAuthCenterContextHolder {
             silenceAuthCenterRole.setRoleName(silenceAuthCenterGrantedAuthority.getRoleName());
             return silenceAuthCenterRole;
         }).collect(Collectors.toSet());
+    }
+
+    public static Set<String> getPermissions() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return Set.of();
+        } else {
+            var principal = authentication.getPrincipal();
+            return principal instanceof SilencePrincipal
+                    ? ((SilencePrincipal) principal).getPermissions()
+                    : Set.of(principal.toString());
+        }
     }
 
 }

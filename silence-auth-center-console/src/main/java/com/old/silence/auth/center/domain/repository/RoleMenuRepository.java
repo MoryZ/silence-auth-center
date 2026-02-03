@@ -1,10 +1,10 @@
 package com.old.silence.auth.center.domain.repository;
 
 
-import com.old.silence.auth.center.domain.model.RoleMenu;
-
 import java.math.BigInteger;
 import java.util.List;
+
+import com.old.silence.auth.center.domain.model.RoleMenu;
 
 /**
  * @author moryzang

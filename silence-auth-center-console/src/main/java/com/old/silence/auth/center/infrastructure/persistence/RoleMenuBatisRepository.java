@@ -1,12 +1,12 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import com.old.silence.auth.center.domain.model.RoleMenu;
 import com.old.silence.auth.center.domain.repository.RoleMenuRepository;
 import com.old.silence.auth.center.infrastructure.persistence.dao.RoleMenuDao;
-
-import java.math.BigInteger;
-import java.util.List;
 
 /**
  * @author moryzang

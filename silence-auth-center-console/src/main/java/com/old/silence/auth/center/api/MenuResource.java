@@ -1,5 +1,8 @@
 package com.old.silence.auth.center.api;
 
+import java.math.BigInteger;
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,20 +12,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.data.commons.converter.QueryWrapperConverter;
-import com.old.silence.dto.TreeDto;
 import com.old.silence.auth.center.api.assembler.MenuMapper;
 import com.old.silence.auth.center.domain.model.Menu;
 import com.old.silence.auth.center.domain.service.MenuService;
 import com.old.silence.auth.center.dto.MenuCommand;
 import com.old.silence.auth.center.dto.MenuDto;
 import com.old.silence.auth.center.dto.MenuQuery;
-
-import java.math.BigInteger;
-import java.util.List;
+import com.old.silence.data.commons.converter.QueryWrapperConverter;
+import com.old.silence.dto.TreeDto;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,63 +36,63 @@ public class MenuResource {
     }
 
     @GetMapping(path = "/menus/tree")
-    @PreAuthorize("hasAuthority('system:SysMenu:tree')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:tree')")
     public List<TreeDto> getSysMenuTree() {
         return menuService.getMenuTree();
     }
 
 
     @GetMapping(path = "/menus/list")
-    @PreAuthorize("hasAuthority('system:SysMenu:tree')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:list')")
     public List<MenuDto> getSysMenuList() {
         return menuService.getMenuList();
 
     }
 
     @GetMapping(path = "/menus", params = {"pageNo", "pageSize"})
-    @PreAuthorize("hasAuthority('system:SysMenu:page')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:page')")
     public Page<Menu> query(Page<Menu> page, MenuQuery menuQuery) {
         var queryWrapper = QueryWrapperConverter.convert(menuQuery, Menu.class);
-        return menuService.query(page, queryWrapper );
+        return menuService.query(page, queryWrapper);
     }
 
     @GetMapping("/menus/{id}")
-    @PreAuthorize("hasAuthority('system:SysMenu:list')")
-    public Menu findSysMenuById(@PathVariable BigInteger id) {
+    @PreAuthorize("@perm.hasAuthority('system:menu:detail')")
+    public Menu findById(@PathVariable BigInteger id) {
         return menuService.findById(id);
     }
 
     @PostMapping("/menus")
-    @PreAuthorize("hasAuthority('system:SysMenu:add')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:add')")
     public BigInteger create(@RequestBody @Validated MenuCommand menuCommand) {
         var menu = menuMapper.convert(menuCommand);
         return menuService.create(menu);
     }
 
     @PutMapping("/menus/{id}")
-    @PreAuthorize("hasAuthority('system:SysMenu:edit')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:edit')")
     public void update(@PathVariable BigInteger id, @RequestBody @Validated MenuCommand menuCommand) {
-        var menu =menuMapper.convert(menuCommand);
+        var menu = menuMapper.convert(menuCommand);
         menu.setId(id); //NO SONAR
         menuService.update(menu);
     }
 
-    @DeleteMapping("/menus/{id}")
-    @PreAuthorize("hasAuthority('system:SysMenu:delete')")
-    public void delete(@PathVariable BigInteger id) {
-        menuService.delete(id);
-    }
-
     @PutMapping("/menus/{id}/enable")
-    @PreAuthorize("hasAuthority('system:SysMenu:enable')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:enable')")
     public void enable(@PathVariable BigInteger id) {
         menuService.updateMenuStatus(id, true);
     }
 
     @PutMapping("/menus/{id}/disable")
-    @PreAuthorize("hasAuthority('system:SysMenu:disable')")
+    @PreAuthorize("@perm.hasAuthority('system:menu:disable')")
     public void disable(@PathVariable BigInteger id) {
         menuService.updateMenuStatus(id, false);
+    }
+
+    @DeleteMapping("/menus/{id}")
+    @PreAuthorize("@perm.hasAuthority('system:menu:delete')")
+    public void delete(@PathVariable BigInteger id) {
+        menuService.delete(id);
     }
 
 

@@ -1,8 +1,8 @@
 package com.old.silence.auth.center.api.config;
 
-import com.google.code.kaptcha.text.impl.DefaultTextCreator;
-
 import java.util.Random;
+
+import com.google.code.kaptcha.text.impl.DefaultTextCreator;
 
 /**
  * @author moryzang
@@ -12,47 +12,36 @@ public class KaptchaTextCreator extends DefaultTextCreator {
 
     @Override
     public String getText() {
-        int result = 0;
+        int result;
         Random random = new Random();
         int x = random.nextInt(10);
         int y = random.nextInt(10);
         StringBuilder suChinese = new StringBuilder();
         int randomoperands = random.nextInt(3);
-        if (randomoperands == 0)
-        {
+        if (randomoperands == 0) {
             result = x * y;
             suChinese.append(CNUMBERS[x]);
             suChinese.append("*");
             suChinese.append(CNUMBERS[y]);
-        }
-        else if (randomoperands == 1)
-        {
-            if ((x != 0) && y % x == 0)
-            {
+        } else if (randomoperands == 1) {
+            if ((x != 0) && y % x == 0) {
                 result = y / x;
                 suChinese.append(CNUMBERS[y]);
                 suChinese.append("/");
                 suChinese.append(CNUMBERS[x]);
-            }
-            else
-            {
+            } else {
                 result = x + y;
                 suChinese.append(CNUMBERS[x]);
                 suChinese.append("+");
                 suChinese.append(CNUMBERS[y]);
             }
-        }
-        else
-        {
-            if (x >= y)
-            {
+        } else {
+            if (x >= y) {
                 result = x - y;
                 suChinese.append(CNUMBERS[x]);
                 suChinese.append("-");
                 suChinese.append(CNUMBERS[y]);
-            }
-            else
-            {
+            } else {
                 result = y - x;
                 suChinese.append(CNUMBERS[y]);
                 suChinese.append("-");

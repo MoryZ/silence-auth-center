@@ -16,8 +16,8 @@ public enum NoticeStatus implements DescribedEnumValue<Byte> {
     private final String description;
 
     NoticeStatus(int value, String description) {
-           this.value = (byte) value;
-           this.description = description;
+        this.value = (byte) value;
+        this.description = description;
     }
 
     public Byte getValue() {

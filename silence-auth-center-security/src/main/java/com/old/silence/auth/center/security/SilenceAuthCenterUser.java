@@ -41,7 +41,7 @@ public class SilenceAuthCenterUser {
         this.cnName = cnName;
     }
 
-    public boolean isAdmin(String username){
+    public boolean isAdmin(String username) {
         return "admin".equals(username);
     }
 }

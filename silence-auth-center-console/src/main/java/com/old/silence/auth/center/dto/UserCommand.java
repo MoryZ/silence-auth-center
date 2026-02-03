@@ -1,12 +1,13 @@
 package com.old.silence.auth.center.dto;
 
 
-import com.old.silence.validation.group.OnlyOnCreationValidation;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import java.math.BigInteger;
 import java.util.List;
+
+import com.old.silence.validation.group.OnlyOnCreationValidation;
 
 public class UserCommand {
     /**
