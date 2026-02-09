@@ -33,8 +33,8 @@ public class MenuMyBatisRepository implements MenuRepository {
     }
 
     @Override
-    public boolean existsByParentIdAndDeleted(BigInteger parentId, boolean deleted) {
-        return menuDao.existsByParentIdAndDeleted(parentId, deleted);
+    public boolean existsByParentId(BigInteger parentId) {
+        return menuDao.existsByParentId(parentId);
     }
 
     @Override
@@ -43,9 +43,8 @@ public class MenuMyBatisRepository implements MenuRepository {
     }
 
     @Override
-    public List<Menu> findAllByDeletedAndStatus(boolean deleted, boolean status) {
+    public List<Menu> findAllByStatus(boolean status) {
         var queryWrapper = new LambdaQueryWrapper<Menu>()
-                .eq(Menu::getDeleted, deleted)
                 .eq(Menu::getStatus, status)
                 .orderByAsc(Menu::getSort);
 
@@ -53,20 +52,18 @@ public class MenuMyBatisRepository implements MenuRepository {
     }
 
     @Override
-    public List<Menu> findAllByDeletedAndStatusAndTypeIn(boolean deleted, boolean status, List<MenuType> types) {
+    public List<Menu> findAllByStatusAndTypeIn(boolean status, List<MenuType> types) {
         var queryWrapper = new LambdaQueryWrapper<Menu>()
                 .in(Menu::getType, types)
-                .eq(Menu::getDeleted, deleted)
                 .eq(Menu::getStatus, status)
                 .orderByAsc(Menu::getSort);
         return menuDao.selectList(queryWrapper);
     }
 
     @Override
-    public List<Menu> findByIdInAndDeletedAndStatus(List<BigInteger> menuIds, boolean deleted, boolean status) {
+    public List<Menu> findByIdInAndStatus(List<BigInteger> menuIds, boolean status) {
         var queryWrapper = new LambdaQueryWrapper<Menu>()
                 .in(Menu::getId, menuIds)
-                .eq(Menu::getDeleted, deleted)
                 .eq(Menu::getStatus, status)
                 .orderByAsc(Menu::getSort);
         return menuDao.selectList(queryWrapper);

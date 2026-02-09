@@ -3,7 +3,10 @@ package com.old.silence.auth.center.infrastructure.persistence.dao;
 import java.math.BigInteger;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -29,10 +32,21 @@ public interface RoleMenuDao extends BaseMapper<RoleMenu> {
 
     int insertBatchSomeColumn(List<RoleMenu> roleMenus);
 
-    @Update("delete from sys_role_menu where role_id = #{id}")
+    @Insert({
+        "<script>",
+        "INSERT INTO sys_role_menu (role_id, menu_id, created_date, created_by, is_deleted) VALUES",
+        "<foreach collection='roleMenus' item='item' separator=','>",
+        "(#{item.roleId}, #{item.menuId}, #{item.createdDate}, #{item.createdBy}, 0)",
+        "</foreach>",
+        "</script>"
+    })
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertBatch(List<RoleMenu> roleMenus);
+
+    @Delete("delete from sys_role_menu where role_id = #{roleId}")
     void deleteByRoleId(BigInteger roleId);
 
-    @Update("delete from sys_role_menu where menu_id = #{id}")
+    @Delete("delete from sys_role_menu where menu_id = #{id}")
     void deleteByMenuId(BigInteger id);
 
 }

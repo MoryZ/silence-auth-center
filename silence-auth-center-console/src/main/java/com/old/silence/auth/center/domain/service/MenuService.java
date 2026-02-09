@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -27,6 +29,8 @@ import com.old.silence.dto.TreeDto;
 @Service
 public class MenuService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
+
     private final MenuRepository menuRepository;
     private final MenuMapper menuMapper;
     private final RoleMenuRepository roleMenuRepository;
@@ -45,8 +49,8 @@ public class MenuService {
     }
 
     public List<TreeDto> getMenuTree() {
-        // 获取所有菜单列表
-        List<Menu> menus = menuRepository.findAllByDeletedAndStatus(false, true);
+        // 获取所有菜单列表（MyBatis-Plus 自动过滤已删除）
+        List<Menu> menus = menuRepository.findAllByStatus(true);
         var treeDTOS = CollectionUtils.transformToList(menus, node -> new TreeDto(node.getId(), node.getName(), node.getParentId()));
 
 
@@ -55,69 +59,77 @@ public class MenuService {
     }
 
     public List<MenuDto> getMenuList() {
-        // 获取所有菜单列表
-        var menus = menuRepository.findAllByDeletedAndStatusAndTypeIn(false, true, List.of(MenuType.CONTENTS, MenuType.MENU));
+        // 获取所有菜单列表（MyBatis-Plus 自动过滤已删除）
+        var menus = menuRepository.findAllByStatusAndTypeIn(true, List.of(MenuType.CONTENTS, MenuType.MENU));
         // 转换为树形结构
         return buildMenuTree(menus);
     }
 
     public Menu findById(BigInteger id) {
         Menu menu = menuRepository.findById(id);
-        if (menu == null || menu.getDeleted()) {
+        if (menu == null) {
             throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
         }
         return menu;
     }
 
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public BigInteger create(Menu menu) {
-        // 创建菜单
-        menu.setDeleted(false);
+        logger.info("创建新菜单：name={}, type={}", menu.getName(), menu.getType());
+        
+        // 创建菜单（deleted 字段由基类自动设置默认值）
         menuRepository.create(menu);
+        
+        logger.info("菜单创建成功：id={}, name={}", menu.getId(), menu.getName());
         return menu.getId();
     }
 
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void update(Menu menu) {
+        logger.info("更新菜单：id={}, name={}", menu.getId(), menu.getName());
+        
         // 检查菜单是否存在
         Menu existingMenu = menuRepository.findById(menu.getId());
-        if (existingMenu == null || existingMenu.getDeleted()) {
+        if (existingMenu == null) {
+            logger.warn("菜单更新失败，菜单不存在：id={}", menu.getId());
             throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
         }
 
         // 更新菜单信息
         menuRepository.update(menu);
+        logger.info("菜单更新成功：id={}", menu.getId());
     }
 
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void delete(BigInteger id) {
-
-        menuRepository.delete(id);
+        logger.info("删除菜单：id={}", id);
+        
         // 检查菜单是否存在
         Menu menu = menuRepository.findById(id);
-        if (menu == null || menu.getDeleted()) {
+        if (menu == null) {
+            logger.warn("菜单删除失败，菜单不存在：id={}", id);
             throw AuthCenterMessages.MENU_NOT_EXIST.createException();
         }
 
-        // 检查是否有子菜单
-        boolean hasChildren = menuRepository.existsByParentIdAndDeleted(id, false);
+        // 检查是否有子菜单（MyBatis-Plus 自动过滤已删除）
+        boolean hasChildren = menuRepository.existsByParentId(id);
         if (hasChildren) {
+            logger.warn("菜单删除失败，存在子菜单：id={}", id);
             throw AuthCenterMessages.SUB_MENU_EXIST.createException();
         }
 
-        // 逻辑删除菜单
-        menu.setDeleted(true);
+        // 逻辑删除菜单（MyBatis-Plus 会自动处理 deleted 字段）
         menuRepository.delete(id);
-
+        logger.info("菜单删除成功：id={}", id);
     }
 
     public void updateMenuStatus(BigInteger id, Boolean status) {
         // 检查菜单是否存在
         Menu menu = menuRepository.findById(id);
-        if (menu == null || menu.getDeleted()) {
+        if (menu == null) {
             throw AuthCenterMessages.MENU_NOT_EXIST.createException();
         }
 
@@ -136,9 +148,9 @@ public class MenuService {
     public List<Menu> getCurrentUserMenus(BigInteger userId) {
 
         List<Menu> menus;
-        //如果是超管，返回所有资源
+        //如果是超管，返回所有资源（MyBatis-Plus 自动过滤已删除）
         if (BigInteger.ONE.compareTo(userId) == 0) {
-            menus = menuRepository.findAllByDeletedAndStatus(false, true);
+            menus = menuRepository.findAllByStatus(true);
         } else {
             // 获取用户角色ID列表
             List<BigInteger> roleIds = userRoleRepository.findByUserId(userId)
@@ -159,8 +171,8 @@ public class MenuService {
                 return List.of();
             }
 
-            // 获取权限标识列表
-            menus = menuRepository.findByIdInAndDeletedAndStatus(menuIds, false, true);
+            // 获取权限标识列表（MyBatis-Plus 自动过滤已删除）
+            menus = menuRepository.findByIdInAndStatus(menuIds, true);
 
         }
         return menus;

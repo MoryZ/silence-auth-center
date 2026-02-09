@@ -82,7 +82,7 @@ public class CaptchaResource {
         try {
             ImageIO.write(image, "jpg", os);
         } catch (IOException e) {
-            throw new IOException();
+            throw new IOException("验证码图片生成失败", e);
         }
 
         objectHashMap.put("uuid", uuid);

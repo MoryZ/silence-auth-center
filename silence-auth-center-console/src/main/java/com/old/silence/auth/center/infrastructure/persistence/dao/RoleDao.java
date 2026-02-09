@@ -11,11 +11,11 @@ import com.old.silence.auth.center.domain.model.Role;
 
 @Mapper
 public interface RoleDao extends BaseMapper<Role> {
-    @Select("SELECT * FROM sys_role WHERE status = #{status} AND is_deleted = #{deleted}")
-    List<Role> findByStatusAndDeleted(boolean status, boolean deleted);
+    @Select("SELECT * FROM sys_role WHERE status = #{status}")
+    List<Role> findByStatus(boolean status);
 
-    @Select("SELECT count(*) FROM sys_role WHERE code = #{code} AND is_deleted = #{deleted}")
-    boolean existsByCodeAndDeleted(String code, boolean deleted);
+    @Select("SELECT count(*) FROM sys_role WHERE code = #{code}")
+    boolean existsByCode(String code);
 
     @Select("SELECT * FROM sys_role WHERE id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId})")
     Set<Role> findRoleByUserId(BigInteger userId);

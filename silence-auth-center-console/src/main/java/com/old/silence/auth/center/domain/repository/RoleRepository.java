@@ -14,7 +14,7 @@ import com.old.silence.auth.center.domain.model.Role;
 
 public interface RoleRepository {
 
-    boolean existsByCodeAndDeleted(String code, boolean deleted);
+    boolean existsByCode(String code);
 
     Set<Role> findRoleByUserId(BigInteger userId);
 
@@ -34,7 +34,7 @@ public interface RoleRepository {
      */
     Role findById(BigInteger id);
 
-    List<Role> findByStatusAndDeleted(boolean status, boolean deleted);
+    List<Role> findByStatus(boolean status);
 
 
     /**

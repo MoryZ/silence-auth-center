@@ -56,8 +56,9 @@ public class UserResource {
 
     @GetMapping("/users/{id}")
     @PreAuthorize("@perm.hasAuthority('system:user:list')")
-    public User getUserById(@PathVariable BigInteger id) {
-        return userService.findById(id);
+    public UserVo getUserById(@PathVariable BigInteger id) {
+        User user = userService.findById(id);
+        return userMapper.toUserVo(user);
     }
 
     @PostMapping("/users")

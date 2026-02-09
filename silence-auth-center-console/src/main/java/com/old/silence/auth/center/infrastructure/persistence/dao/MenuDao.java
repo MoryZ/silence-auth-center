@@ -10,6 +10,6 @@ import com.old.silence.auth.center.domain.model.Menu;
 @Mapper
 public interface MenuDao extends BaseMapper<Menu> {
 
-    @Select("select 1 from t_menu where parent_id = #{parentId} and is_deleted = #{deleted}")
-    boolean existsByParentIdAndDeleted(BigInteger parentId, boolean deleted);
+    @Select("select 1 from sys_menu where parent_id = #{parentId} limit 1")
+    boolean existsByParentId(BigInteger parentId);
 }

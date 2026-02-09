@@ -12,6 +12,7 @@ import com.old.silence.auth.center.enums.NoticeStatus;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.infrastructure.persistence.dao.NoticeDao;
 import com.old.silence.auth.center.security.SilenceAuthCenterContextHolder;
+import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -72,7 +73,14 @@ public class NoticeMyBatisRepository implements NoticeRepository {
 
     @Override
     public void clearAllNotices() {
-        var username = SilenceAuthCenterContextHolder.getAuthenticatedUserName().orElseThrow(AuthCenterMessages.USER_NOT_EXIST::createException);
+        var username = SilenceAuthCenterContextHolder.getAuthenticatedUserName()
+            .orElseThrow(AuthCenterMessages.USER_NOT_EXIST::createException);
+        
+        // 参数验证 - 防止 SQL 注入和逻辑错误
+        if (StringUtils.isBlank(username)) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        
         noticeDao.deleteAll(username);
     }
 

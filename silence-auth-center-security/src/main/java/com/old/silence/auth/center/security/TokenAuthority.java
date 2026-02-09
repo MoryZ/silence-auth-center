@@ -17,12 +17,17 @@ public class TokenAuthority implements SilenceAuthCenterTokenAuthority {
 
     @Override
     public String issueToken(SilencePrincipal principal) {
-        return null;
+        Algorithm algorithm = Algorithm.HMAC256(SecurityConstants.getTokenSecret());
+        return JWT.create()
+                .withSubject(principal.getUsername())
+                .withIssuer(SecurityConstants.TOKEN_ISSUER)
+                .withAudience(SecurityConstants.TOKEN_AUDIENCE)
+                .sign(algorithm);
     }
 
     @Override
     public boolean verifyToken(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(SecurityConstants.TOKEN_SECRET);
+        Algorithm algorithm = Algorithm.HMAC256(SecurityConstants.getTokenSecret());
         JWTVerifier verifier = JWT.require(algorithm).build();
         try {
             verifier.verify(token);
@@ -31,14 +36,14 @@ public class TokenAuthority implements SilenceAuthCenterTokenAuthority {
             LOGGER.error("Token verification failed: {}", ex.getLocalizedMessage());
             throw new TokenVerificationException(STATUS_UNAUTHORIZED, "token is invalid", ex);
         } catch (TokenExpiredException ex) {
-            LOGGER.warn("Token expired: {}", ex.getLocalizedMessage());
+            LOGGER.debug("Token expired: {}", ex.getLocalizedMessage());
             throw new TokenVerificationException(STATUS_FORBIDDEN, "token is expired", ex);
         }
     }
 
     @Override
     public String getSubject(String token) {
-        return JWT.require(Algorithm.HMAC256(SecurityConstants.TOKEN_SECRET))
+        return JWT.require(Algorithm.HMAC256(SecurityConstants.getTokenSecret()))
                 .build()
                 .verify(token)
                 .getSubject();

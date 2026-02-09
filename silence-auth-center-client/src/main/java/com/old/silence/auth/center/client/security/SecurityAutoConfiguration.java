@@ -28,6 +28,9 @@ public class SecurityAutoConfiguration {
     @Value("${silence.auth.center.security.api.enable:true}")
     private boolean enable;
 
+    @Value("${silence.auth.center.security.api.cors.allowed-origins:}")
+    private String[] allowedOrigins;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector handlerMappingIntrospector) throws Exception {
@@ -37,9 +40,14 @@ public class SecurityAutoConfiguration {
                 // 配置 CORS
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*")); // 生产环境需指定具体域名
+                    if (allowedOrigins != null && allowedOrigins.length > 0) {
+                        corsConfiguration.setAllowedOrigins(Arrays.asList(allowedOrigins));
+                        corsConfiguration.setAllowCredentials(true);
+                    } else {
+                        corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
+                        corsConfiguration.setAllowCredentials(false);
+                    }
                     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                    corsConfiguration.setAllowCredentials(true);
                     corsConfiguration.setAllowedHeaders(Collections.singletonList("*")); // 按需细化
                     corsConfiguration.setExposedHeaders(Collections.singletonList("*")); // 按需细化
                     corsConfiguration.setMaxAge(3600L); // 预检请求缓存时间
@@ -51,17 +59,20 @@ public class SecurityAutoConfiguration {
                 )
                 // 配置请求授权规则（核心：认证始终启用，仅白名单根据 enable 切换）
                 .authorizeHttpRequests(auth -> {
-                    if (enable) {
-                        // 开启白名单：白名单路径放行，其余需认证
-                        if (whiteListApi != null && whiteListApi.length > 0) {
-                            auth.requestMatchers(whiteListApi).permitAll();
-                        }
+                    if (!enable) {
+                        auth.anyRequest().permitAll();
+                        return;
                     }
-                    // 无论是否开启白名单，所有请求默认需要认证（白名单仅在 enable 为 true 时生效）
+                    // 开启白名单：白名单路径放行，其余需认证
+                    if (whiteListApi != null && whiteListApi.length > 0) {
+                        auth.requestMatchers(whiteListApi).permitAll();
+                    }
                     auth.anyRequest().authenticated();
-                })
-                // 始终添加 Token 过滤器（因为认证始终启用）
-                .addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                });
+        if (enable) {
+            // 仅在启用时添加 Token 过滤器
+            http.addFilterBefore(tokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        }
         // 配置异常处理：只处理认证/授权异常，其他异常继续传播到 Spring MVC 的异常处理器
         http.exceptionHandling(e -> {
             // 使用自定义的认证入口点，区分接口不存在（404）和认证失败（401）

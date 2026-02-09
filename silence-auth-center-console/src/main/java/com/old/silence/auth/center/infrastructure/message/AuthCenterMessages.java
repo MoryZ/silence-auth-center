@@ -13,6 +13,7 @@ public enum AuthCenterMessages implements ErrorCodedEnumMessageSourceResolvable 
     SUB_MENUS_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 56),
     ROLE_NOT_EXIST(HttpStatus.BAD_REQUEST, 57),
     ROLE_CODE_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 58),
+    USERNAME_ALREADY_EXIST(HttpStatus.BAD_REQUEST, 59), // "用户名已存在"
 
     ;
 

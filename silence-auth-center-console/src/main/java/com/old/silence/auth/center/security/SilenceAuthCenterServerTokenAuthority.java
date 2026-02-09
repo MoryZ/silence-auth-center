@@ -1,14 +1,15 @@
 package com.old.silence.auth.center.security;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -26,7 +27,7 @@ public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterT
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SilenceAuthCenterServerTokenAuthority.class);
 
-    @Value("${silence.auth.center.jwt.secret:silence-auth-center}")
+    @Value("${silence.auth.center.jwt.secret}")
     private String jwtSecret;
 
     @Value("${silence.auth.center.jwt.expiration:6}")
@@ -36,6 +37,13 @@ public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterT
 
     public SilenceAuthCenterServerTokenAuthority(JacksonMapper jacksonMapper) {
         this.jacksonMapper = jacksonMapper;
+    }
+
+    @PostConstruct
+    void validateJwtSecret() {
+        if (!StringUtils.hasText(jwtSecret)) {
+            throw new IllegalStateException("JWT secret is not configured. Set silence.auth.center.jwt.secret.");
+        }
     }
 
     @Override
@@ -52,7 +60,7 @@ public class SilenceAuthCenterServerTokenAuthority implements SilenceAuthCenterT
                 .withIssuer(SecurityConstants.TOKEN_ISSUER)
                 .withAudience(SecurityConstants.TOKEN_AUDIENCE)
                 .withIssuedAt(now)
-                .withExpiresAt(now.plus(jwtExpirationSeconds, ChronoUnit.HOURS))
+                .withExpiresAt(now.plusSeconds(jwtExpirationSeconds))
                 .sign(algorithm);
     }
 

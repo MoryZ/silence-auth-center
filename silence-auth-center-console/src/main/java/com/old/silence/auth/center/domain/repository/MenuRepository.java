@@ -16,7 +16,7 @@ public interface MenuRepository {
 
     Page<Menu> query(Page<Menu> page, QueryWrapper<Menu> queryWrapper);
 
-    boolean existsByParentIdAndDeleted(BigInteger parentId, boolean deleted);
+    boolean existsByParentId(BigInteger parentId);
 
 
     /**
@@ -28,23 +28,21 @@ public interface MenuRepository {
     Menu findById(BigInteger id);
 
     /**
-     * 查找所有启用且未删除的菜单列表
+     * 查找所有启用的菜单列表（自动过滤已删除）
      *
-     * @param deleted 是否删除
      * @param status  是否启用
      * @param types   菜单类型集合
      * @return 菜单列表
      */
-    List<Menu> findAllByDeletedAndStatusAndTypeIn(boolean deleted, boolean status, List<MenuType> types);
+    List<Menu> findAllByStatusAndTypeIn(boolean status, List<MenuType> types);
 
     /**
-     * 根据查找子菜单列表
+     * 查找所有启用的菜单（自动过滤已删除）
      *
-     * @param deleted 是否删除
      * @param status  是否启用
      * @return 子菜单列表
      */
-    List<Menu> findAllByDeletedAndStatus(boolean deleted, boolean status);
+    List<Menu> findAllByStatus(boolean status);
 
     /**
      * 创建新菜单
@@ -70,5 +68,5 @@ public interface MenuRepository {
     void delete(BigInteger id);
 
 
-    List<Menu> findByIdInAndDeletedAndStatus(List<BigInteger> menuIds, boolean deleted, boolean status);
+    List<Menu> findByIdInAndStatus(List<BigInteger> menuIds, boolean status);
 }

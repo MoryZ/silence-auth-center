@@ -25,8 +25,8 @@ public class RoleMyBatisRepository implements RoleRepository {
     private final RoleMenuDao roleMenuDao;
 
     @Override
-    public boolean existsByCodeAndDeleted(String code, boolean deleted) {
-        return roleDao.existsByCodeAndDeleted(code, deleted);
+    public boolean existsByCode(String code) {
+        return roleDao.existsByCode(code);
     }
 
     @Override
@@ -51,12 +51,12 @@ public class RoleMyBatisRepository implements RoleRepository {
     }
 
     @Override
-    public List<Role> findByStatusAndDeleted(boolean status, boolean deleted) {
-        return roleDao.findByStatusAndDeleted(status, deleted);
+    public List<Role> findByStatus(boolean status) {
+        return roleDao.findByStatus(status);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public int create(Role role) {
         var rowsAffected = roleDao.insert(role);
 
