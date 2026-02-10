@@ -4,6 +4,10 @@ logging:
     '[com.old.silence.auth.center]': debug
 
 
+
+  logback:
+    tracing-output-enabled: true
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -52,6 +56,12 @@ silence:
   auth:
     center:
       jwt:
-        secret: ${SILENCE_AUTH_CENTER_JWT_SECRET:dev-secret}
+        secret: ${SILENCE_AUTH_CENTER_JWT_SECRET:silence-auth-center}
         expiration: ${SILENCE_AUTH_CENTER_JWT_EXPIRATION_SECONDS:21600}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0 # 强制 100% 生成 TraceId
+
 
