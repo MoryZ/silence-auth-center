@@ -8,6 +8,9 @@ spring:
       max-request-size: 60MB
   application.name: auth-service
   messages.basename: messages/silence_auth_center_messages
+  liquibase:
+    change-log: classpath:/db/changelogs/changelog-master.xml
+    enabled: false
 
 platform:
   system:

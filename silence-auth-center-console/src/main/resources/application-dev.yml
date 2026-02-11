@@ -2,9 +2,6 @@ logging:
   level:
     root: info
     '[com.old.silence.auth.center]': debug
-
-
-
   logback:
     tracing-output-enabled: true
 
