@@ -2,9 +2,11 @@ package com.old.silence.auth.center.domain.repository;
 
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.User;
 
@@ -14,29 +16,23 @@ import com.old.silence.auth.center.domain.model.User;
 
 public interface UserRepository {
 
-
-    /**
-     *
-     * @param queryWrapper 查询条件
-     * @return 用户
-     */
-    User findByCriteria(QueryWrapper<User> queryWrapper);
-
     /**
      * 根据用户ID查找用户
      *
      * @param id 用户ID
+     * @param projectionType 投影类型
      * @return User 对象
      */
-    User findById(BigInteger id);
+    <T> Optional<T> findById(BigInteger id, Class<T> projectionType);
 
     /**
      * 分页查询
      * @param page 分页参数
      * @param queryWrapper 查询条件
+     * @param projectionType 投影类型
      * @return Page<User> 分页结果
      */
-    Page<User> queryPage(Page<User> page, QueryWrapper<User> queryWrapper);
+    <T> IPage<T> queryPage(Page<User> page, QueryWrapper<User> queryWrapper, Class<T> projectionType);
 
 
     /**

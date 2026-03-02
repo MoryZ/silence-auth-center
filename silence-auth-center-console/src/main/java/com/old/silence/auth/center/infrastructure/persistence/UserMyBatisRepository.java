@@ -1,11 +1,13 @@
 package com.old.silence.auth.center.infrastructure.persistence;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.User;
 import com.old.silence.auth.center.domain.repository.UserRepository;
@@ -23,31 +25,24 @@ public class UserMyBatisRepository implements UserRepository {
     }
 
     @Override
-    public User findById(BigInteger id) {
-        return userDao.selectById(id);
+    public <T> Optional<T> findById(BigInteger id, Class<T> projectionType) {
+        return userDao.findById(id, projectionType);
     }
 
-    @Override
-    public User findByCriteria(QueryWrapper<User> queryWrapper) {
-        return userDao.selectOne(queryWrapper);
-    }
 
     @Override
-    public Page<User> queryPage(Page<User> page, QueryWrapper<User> queryWrapper) {
-        return userDao.selectPage(page, queryWrapper);
+    public <T> IPage<T> queryPage(Page<User> page, QueryWrapper<User> queryWrapper, Class<T> projectionType) {
+        return userDao.findByQuery(queryWrapper, page, projectionType);
     }
 
     @Override
     public User findByUsernameAndStatus(String username, Boolean status) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(User::getUsername, username)
-                .eq(User::getStatus, status);
-        return userDao.selectOne(queryWrapper);
+        return userDao.findByUsernameAndStatus(username, status);
     }
 
     @Override
     public int create(User user) {
-        return userDao.insert(user);
+        return userDao.create(user);
     }
 
     @Override
