@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.User;
@@ -22,6 +20,11 @@ public class UserMyBatisRepository implements UserRepository {
 
     public UserMyBatisRepository(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    @Override
+    public boolean existsById(BigInteger id) {
+        return userDao.existsById(id);
     }
 
     @Override
@@ -42,23 +45,27 @@ public class UserMyBatisRepository implements UserRepository {
 
     @Override
     public int create(User user) {
-        return userDao.create(user);
+        return userDao.insert(user);
     }
 
     @Override
     public int update(User user) {
-        return userDao.updateById(user);
+        return userDao.update(user);
     }
 
     @Override
-    public int update(LambdaUpdateWrapper<User> updateWrapper) {
-        return userDao.update(updateWrapper);
+    public int updateNonNull(User user) {
+        return userDao.updateNonNull(user);
     }
 
     @Override
     public int updateStatus(Boolean status, BigInteger id) {
-        return userDao.update(new UpdateWrapper<User>().lambda().set(User::getStatus, status)
-                .eq(User::getId, id));
+        return userDao.updateStatusById(status, id);
+    }
+
+    @Override
+    public int updatePassword(BigInteger id, String password) {
+        return userDao.updatePasswordById(password, id);
     }
 
     @Override
@@ -66,8 +73,5 @@ public class UserMyBatisRepository implements UserRepository {
         return userDao.deleteById(id);
     }
 
-    @Override
-    public int updatePassword(BigInteger id, String password) {
-        return userDao.updatePasswordById(password, id);
-    }
+
 }

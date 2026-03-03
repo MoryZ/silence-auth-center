@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.User;
 import com.old.silence.auth.center.domain.model.UserRole;
@@ -14,6 +14,7 @@ import com.old.silence.auth.center.domain.repository.UserRepository;
 import com.old.silence.auth.center.domain.repository.UserRoleRepository;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.util.PasswordUtil;
+import com.old.silence.core.exception.ResourceNotFoundException;
 import com.old.silence.core.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -44,8 +45,8 @@ public class UserService {
         this.passwordUtil = passwordUtil;
     }
 
-    public Page<User> query(Page<User> page, QueryWrapper<User> queryWrapper) {
-        var userPage = userRepository.queryPage(page, queryWrapper);
+    public IPage<User> query(Page<User> page, QueryWrapper<User> queryWrapper) {
+        var userPage = userRepository.queryPage(page, queryWrapper, User.class);
 
         var userIds = userPage.getRecords()
                 .stream().map(User::getId).collect(Collectors.toList());
@@ -66,7 +67,8 @@ public class UserService {
 
 
     public User findById(BigInteger id) {
-        return userRepository.findById(id);
+        return userRepository.findById(id, User.class)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
 
@@ -130,7 +132,7 @@ public class UserService {
         logger.info("更新用户信息：id={}, username={}", user.getId(), user.getUsername());
         
         // 检查用户是否存在
-        User existingUser = userRepository.findById(user.getId());
+        User existingUser = findById(user.getId());
         
         // 处理密码更新
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -185,8 +187,8 @@ public class UserService {
         logger.info("重置用户密码：id={}", id);
         
         // 验证用户是否存在
-        User user = userRepository.findById(id);
-        if (user == null) {
+        boolean exists = userRepository.existsById(id);
+        if (!exists) {
             logger.warn("密码重置失败，用户不存在：id={}", id);
             throw AuthCenterMessages.USER_NOT_EXIST.createException();
         }
@@ -197,13 +199,13 @@ public class UserService {
         // 更新密码
         var newPassword = passwordUtil.encodePassword(password);
 
-        var updateWrapper = new UpdateWrapper<User>().lambda()
-                .set(User::getPassword, newPassword)
-                .set(User::getFirstLogin, false)
-                .set(User::getForceChangePassword, false)
-                .set(User::getPasswordChangedTime, Instant.now())
-                .eq(User::getId, id);
-        userRepository.update(updateWrapper);
+        var updateUser = new User();
+        updateUser.setPassword(newPassword);
+        updateUser.setFirstLogin(false);
+        updateUser.setForceChangePassword(false);
+        updateUser.setPasswordChangedTime(Instant.now());
+        updateUser.setId(id);
+        userRepository.updateNonNull(updateUser);
         
         logger.info("密码重置成功：id={}", id);
     }
@@ -243,10 +245,8 @@ public class UserService {
     }
 
     public boolean existsByUsername(String username) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(User::getUsername, username)
-                .eq(User::getStatus, true);
-        return userRepository.findByCriteria(queryWrapper) != null;
+
+        return userRepository.findByUsernameAndStatus(username, true) != null;
     }
 
 

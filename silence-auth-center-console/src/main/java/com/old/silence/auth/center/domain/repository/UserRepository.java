@@ -17,6 +17,14 @@ import com.old.silence.auth.center.domain.model.User;
 public interface UserRepository {
 
     /**
+     * 判断id 是否存在
+     *
+     * @param id 主键id
+     * @return 是否存在
+     */
+    boolean existsById(BigInteger id);
+
+    /**
      * 根据用户ID查找用户
      *
      * @param id 用户ID
@@ -60,7 +68,7 @@ public interface UserRepository {
      */
     int update(User user);
 
-    int update(LambdaUpdateWrapper<User> updateWrapper);
+    int updateNonNull(User user);
 
     /**
      * 更新用户状态
@@ -71,13 +79,6 @@ public interface UserRepository {
     int updateStatus(Boolean status, BigInteger id);
 
     /**
-     * 删除用户
-     *
-     * @param id 用户ID
-     */
-    int delete(BigInteger id);
-
-    /**
      * 更新用户的密码
      *
      * @param id       用户ID
@@ -86,6 +87,11 @@ public interface UserRepository {
      */
     int updatePassword(BigInteger id, String password);
 
-
+    /**
+     * 删除用户
+     *
+     * @param id 用户ID
+     */
+    int delete(BigInteger id);
 
 }
