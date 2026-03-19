@@ -14,6 +14,7 @@ import com.old.silence.auth.center.domain.repository.UserRepository;
 import com.old.silence.auth.center.domain.repository.UserRoleRepository;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.util.PasswordUtil;
+import com.old.silence.auth.center.vo.UserVo;
 import com.old.silence.core.exception.ResourceNotFoundException;
 import com.old.silence.core.util.CollectionUtils;
 
@@ -45,11 +46,11 @@ public class UserService {
         this.passwordUtil = passwordUtil;
     }
 
-    public IPage<User> query(Page<User> page, QueryWrapper<User> queryWrapper) {
-        var userPage = userRepository.queryPage(page, queryWrapper, User.class);
+    public IPage<UserVo> query(Page<User> page, QueryWrapper<User> queryWrapper) {
+        var userPage = userRepository.queryPage(page, queryWrapper, UserVo.class);
 
         var userIds = userPage.getRecords()
-                .stream().map(User::getId).collect(Collectors.toList());
+                .stream().map(UserVo::getId).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(userIds)) {
             return userPage;
         }
@@ -59,7 +60,7 @@ public class UserService {
                         UserRole::getRoleId,
                         Collectors.toSet()  // 去重
                 )));
-        for (User record : userPage.getRecords()) {
+        for (UserVo record : userPage.getRecords()) {
             record.setRoleIds(groupingByUserIdRoleIdsMap.get(record.getId()));
         }
         return userPage;

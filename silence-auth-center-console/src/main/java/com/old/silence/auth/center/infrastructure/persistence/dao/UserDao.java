@@ -5,9 +5,9 @@ import java.math.BigInteger;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import com.old.silence.auth.center.domain.model.User;
-import com.old.silence.data.mybatis.projection.ProjectionRepository;
+import com.old.silence.data.mybatis.projection.ProjectionMapperRepository;
 
-public interface UserDao extends ProjectionRepository<User, BigInteger> {
+public interface UserDao extends ProjectionMapperRepository<User, BigInteger> {
 
     @Select("SELECT id,username,nickname,password  FROM sys_user WHERE username = #{username} AND status = #{status}")
     User findByUsernameAndStatus(String username, Boolean status);

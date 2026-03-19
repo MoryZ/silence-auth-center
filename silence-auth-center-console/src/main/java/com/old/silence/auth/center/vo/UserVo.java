@@ -53,7 +53,7 @@ public class UserVo extends AuditableVo {
     /**
      * 角色ID列表
      */
-    private List<BigInteger> roleIds;
+    private Set<BigInteger> roleIds;
 
     private Set<String> permissions;
 
@@ -129,11 +129,11 @@ public class UserVo extends AuditableVo {
         isForceChangePassword = forceChangePassword;
     }
 
-    public List<BigInteger> getRoleIds() {
+    public Set<BigInteger> getRoleIds() {
         return roleIds;
     }
 
-    public void setRoleIds(List<BigInteger> roleIds) {
+    public void setRoleIds(Set<BigInteger> roleIds) {
         this.roleIds = roleIds;
     }
 

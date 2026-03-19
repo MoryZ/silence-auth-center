@@ -50,8 +50,7 @@ public class UserResource {
     @PreAuthorize("@perm.hasAuthority('system:user:page')")
     public IPage<UserVo> query(Page<User> page, UserQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, User.class);
-        var userPage = userService.query(page, queryWrapper);
-        return userPage.convert(userMapper::toUserVo);
+        return userService.query(page, queryWrapper);
     }
 
     @GetMapping("/users/{id}")
