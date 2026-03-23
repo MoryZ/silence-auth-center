@@ -20,12 +20,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.api.assembler.UserMapper;
 import com.old.silence.auth.center.domain.model.User;
+import com.old.silence.auth.center.domain.model.UserRole;
 import com.old.silence.auth.center.domain.service.UserService;
 import com.old.silence.auth.center.dto.ModifyUserPasswordCommand;
 import com.old.silence.auth.center.dto.UserCommand;
 import com.old.silence.auth.center.dto.ResetUserPasswordCommand;
 import com.old.silence.auth.center.dto.UserQuery;
 import com.old.silence.auth.center.vo.UserVo;
+import com.old.silence.core.util.CollectionUtils;
 import com.old.silence.data.commons.converter.QueryWrapperConverter;
 
 @RestController
@@ -106,7 +108,14 @@ public class UserResource {
     @PutMapping("/users/{id}/roles")
     @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void assignUserRoles(@PathVariable BigInteger id, @RequestBody @NotEmpty Set<BigInteger> roleIds) {
-        userService.assignUserRoles(id, roleIds);
+        var userRoles = CollectionUtils.transformToList(roleIds, roleId -> {
+            var userRole = new UserRole();
+            userRole.setRoleId(roleId);
+            userRole.setUserId(id);
+
+            return userRole;
+        });
+        userService.assignUserRoles(id, userRoles);
     }
 
     @DeleteMapping("/users/{id}")

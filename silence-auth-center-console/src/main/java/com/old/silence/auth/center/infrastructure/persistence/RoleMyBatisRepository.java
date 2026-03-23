@@ -14,6 +14,7 @@ import com.old.silence.auth.center.domain.model.RoleMenu;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.infrastructure.persistence.dao.RoleDao;
 import com.old.silence.auth.center.infrastructure.persistence.dao.RoleMenuDao;
+import com.old.silence.core.util.CollectionUtils;
 
 /**
  * @author moryzang
@@ -61,8 +62,8 @@ public class RoleMyBatisRepository implements RoleRepository {
         var rowsAffected = roleDao.insert(role);
 
         // 分配菜单权限
-        if (role.getMenuIds() != null && !role.getMenuIds().isEmpty()) {
-            assignRoleMenus(role.getId(), role.getMenuIds());
+        if (CollectionUtils.isNotEmpty(role.getRoleMenus())) {
+            assignRoleMenus(role.getId(), role.getRoleMenus());
         }
         return rowsAffected;
     }
@@ -73,8 +74,8 @@ public class RoleMyBatisRepository implements RoleRepository {
         var rowsAffected = roleDao.updateById(role);
 
         // 更新菜单权限
-        if (role.getMenuIds() != null) {
-            assignRoleMenus(role.getId(), role.getMenuIds());
+        if (CollectionUtils.isNotEmpty(role.getRoleMenus()))  {
+            assignRoleMenus(role.getId(), role.getRoleMenus());
         }
         return rowsAffected;
 
@@ -91,22 +92,12 @@ public class RoleMyBatisRepository implements RoleRepository {
     }
 
 
-    public void assignRoleMenus(BigInteger roleId, Set<BigInteger> menuIds) {
+    private void assignRoleMenus(BigInteger roleId, List<RoleMenu> roleMenus) {
         // 删除原有菜单权限
         roleMenuDao.delete(new LambdaQueryWrapper<RoleMenu>()
                 .eq(RoleMenu::getRoleId, roleId));
 
         // 分配新菜单权限
-        if (menuIds != null && !menuIds.isEmpty()) {
-            List<RoleMenu> roleMenus = menuIds.stream()
-                    .map(menuId -> {
-                        RoleMenu roleMenu = new RoleMenu();
-                        roleMenu.setRoleId(roleId);
-                        roleMenu.setMenuId(menuId);
-                        return roleMenu;
-                    })
-                    .toList();
-            roleMenus.forEach(roleMenuDao::insert);
-        }
+        roleMenuDao.insertBatch(roleMenus);
     }
 }

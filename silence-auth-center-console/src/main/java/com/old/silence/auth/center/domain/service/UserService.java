@@ -2,6 +2,8 @@ package com.old.silence.auth.center.domain.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -91,8 +93,8 @@ public class UserService {
         userRepository.create(user);
         
         // 分配角色
-        if (user.getRoleIds() != null && !user.getRoleIds().isEmpty()) {
-            assignUserRoles(user.getId(), user.getRoleIds());
+        if (CollectionUtils.isEmpty(user.getUserRoles())) {
+            assignUserRoles(user.getId(), user.getUserRoles());
         }
         
         logger.info("用户创建成功：id={}, username={}", user.getId(), user.getUsername());
@@ -151,8 +153,8 @@ public class UserService {
         userRepository.update(user);
 
         // 更新角色
-        if (user.getRoleIds() != null) {
-            assignUserRoles(user.getId(), user.getRoleIds());
+        if (user.getUserRoles() != null) {
+            assignUserRoles(user.getId(), user.getUserRoles());
         }
         
         logger.info("用户信息更新成功：id={}", user.getId());
@@ -180,6 +182,11 @@ public class UserService {
 
     public void updateUserStatus(BigInteger id, Boolean status) {
         userRepository.updateStatus(status, id);
+        if (Boolean.FALSE.equals(status)) {
+            // 用户被禁用时驱逐缓存，下次请求会重新查库
+            userRepository.findById(id, User.class)
+                    .ifPresent(user -> evictUserExistenceCache(user.getUsername()));
+        }
     }
 
 
@@ -222,32 +229,30 @@ public class UserService {
 
 
     @Transactional
-    public void assignUserRoles(BigInteger userId, Set<BigInteger> roleIds) {
-        logger.info("分配用户角色：userId={}, roleCount={}", userId, roleIds != null ? roleIds.size() : 0);
+    public void assignUserRoles(BigInteger userId, List<UserRole> userRoles) {
+        logger.info("分配用户角色：userId={}, roleCount={}", userId, CollectionUtils.size(userRoles));
         
         // 删除原有角色
         userRoleRepository.deleteByUserId(userId);
 
         // 分配新角色
-        if (roleIds != null && !roleIds.isEmpty()) {
-            List<UserRole> userRoles = roleIds.stream()
-                    .map(roleId -> {
-                        UserRole userRole = new UserRole();
-                        userRole.setUserId(userId);
-                        userRole.setRoleId(roleId);
-                        return userRole;
-                    })
-                    .toList();
+        if (CollectionUtils.isNotEmpty(userRoles)) {
+
             userRoleRepository.bulkCreate(userRoles);
-            logger.info("用户角色分配成功：userId={}, roleIds={}", userId, roleIds);
+            logger.info("用户角色分配成功：userId={}, roleIds={}", userId, CollectionUtils.transformToList(userRoles, UserRole::getRoleId));
         } else {
             logger.info("清除用户所有角色：userId={}", userId);
         }
     }
 
+    @Cacheable(cacheNames = "userExistence", key = "#username")
     public boolean existsByUsername(String username) {
-
         return userRepository.findByUsernameAndStatus(username, true) != null;
+    }
+
+    @CacheEvict(cacheNames = "userExistence", key = "#username")
+    public void evictUserExistenceCache(String username) {
+        // 用户被禁用或删除后主动驱逐缓存
     }
 
 
