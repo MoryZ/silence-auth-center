@@ -2,7 +2,6 @@ package com.old.silence.auth.center.vo;
 
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Set;
 
 import com.old.silence.data.commons.domain.AuditableVo;
@@ -45,9 +44,9 @@ public class UserVo extends AuditableVo {
      */
     private String phone;
 
-    private Boolean isFirstLogin;
+    private Boolean firstLogin;
 
-    private Boolean isForceChangePassword;
+    private Boolean forceChangePassword;
 
 
     /**
@@ -114,19 +113,19 @@ public class UserVo extends AuditableVo {
     }
 
     public Boolean getFirstLogin() {
-        return isFirstLogin;
+        return firstLogin;
     }
 
     public void setFirstLogin(Boolean firstLogin) {
-        isFirstLogin = firstLogin;
+        this.firstLogin = firstLogin;
     }
 
     public Boolean getForceChangePassword() {
-        return isForceChangePassword;
+        return forceChangePassword;
     }
 
     public void setForceChangePassword(Boolean forceChangePassword) {
-        isForceChangePassword = forceChangePassword;
+        this.forceChangePassword = forceChangePassword;
     }
 
     public Set<BigInteger> getRoleIds() {

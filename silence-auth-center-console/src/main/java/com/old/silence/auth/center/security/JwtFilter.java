@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.apache.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ import com.old.silence.auth.center.domain.service.UserService;
 import com.old.silence.auth.center.security.exception.TokenVerificationException;
 import com.old.silence.core.util.CollectionUtils;
 import com.old.silence.json.JacksonMapper;
+import com.old.silence.webmvc.common.ApiResult;
 
 /**
  * @author moryzang
@@ -65,7 +67,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } catch (TokenVerificationException ex) {
+            // 1. 设置响应头
             response.setStatus(ex.getStatusCode());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("UTF-8");
+
+            // 2. 直接复用你的全局统一返回对象
+            ApiResult<?> result = ApiResult.error(ex.getStatusCode(), ex.getMessage());
+
+            // 3. 序列化并输出
+            response.getWriter().write(jacksonMapper.toJson(result));
+
         }
     }
 

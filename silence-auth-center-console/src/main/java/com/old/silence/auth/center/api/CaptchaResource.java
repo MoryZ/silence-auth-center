@@ -19,6 +19,7 @@ import com.google.code.kaptcha.Producer;
 import com.old.silence.auth.center.enums.CaptchaType;
 import com.old.silence.auth.center.enums.RedisCacheEnum;
 import com.old.silence.auth.center.util.Base64Utils;
+import com.old.silence.core.context.CommonErrors;
 
 /**
  * @author moryzang
@@ -60,7 +61,8 @@ public class CaptchaResource {
         String uuid = UUID.randomUUID().toString();
         String verifyKey = RedisCacheEnum.CAPTCHA_CODE_KEY.getCacheKey(uuid);
 
-        String capStr, code = null;
+        String capStr;
+        String code = null;
         BufferedImage image = null;
 
         // 生成验证码
@@ -74,6 +76,9 @@ public class CaptchaResource {
             capStr = capText;
             code = capText;
             image = captchaProducer.createImage(capStr);
+        }
+        if (code == null) {
+            throw CommonErrors.SERVICE_UNAVAILABLE.createException("Captcha");
         }
 
         valueOperations.set(verifyKey, code, 2, TimeUnit.MINUTES);
