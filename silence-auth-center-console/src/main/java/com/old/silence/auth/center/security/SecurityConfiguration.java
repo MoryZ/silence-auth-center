@@ -22,18 +22,15 @@ import org.springframework.web.cors.CorsConfiguration;
 public class SecurityConfiguration {
 
     private final JwtFilter jwtFilter;
-    private final PermissionFilter permissionFilter;
 
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     private final CustomAccessDeniedHandler accessDeniedHandler;
 
     public SecurityConfiguration(JwtFilter jwtFilter,
-                                 PermissionFilter permissionFilter,
                                  CustomAuthenticationEntryPoint authenticationEntryPoint,
                                  CustomAccessDeniedHandler accessDeniedHandler) {
         this.jwtFilter = jwtFilter;
-        this.permissionFilter = permissionFilter;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
     }
@@ -52,7 +49,7 @@ public class SecurityConfiguration {
                         SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         // 公开接口
-                        .requestMatchers("/api/v1//users/modifyPassword").permitAll()
+                    .requestMatchers("/api/v1/users/modifyPassword").permitAll()
                         .requestMatchers("/api/v1/users/{id}/resetPassword").permitAll()
                         .requestMatchers("/api/v1/users/register").permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
@@ -68,7 +65,6 @@ public class SecurityConfiguration {
                 .accessDeniedHandler(accessDeniedHandler)
         );
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(permissionFilter, JwtFilter.class);
         return http.build();
 
     }

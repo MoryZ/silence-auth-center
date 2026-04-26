@@ -14,7 +14,10 @@ public class SilencePrincipal {
     public SilencePrincipal() {
     }
 
-    public SilencePrincipal(Set<SilenceAuthCenterRole> roles, Set<String> permissions) {
+    public SilencePrincipal(BigInteger userId, String username, String cnName, Set<SilenceAuthCenterRole> roles, Set<String> permissions) {
+        this.userId = userId;
+        this.username = username;
+        this.cnName = cnName;
         this.roles = roles;
         this.permissions = permissions;
     }

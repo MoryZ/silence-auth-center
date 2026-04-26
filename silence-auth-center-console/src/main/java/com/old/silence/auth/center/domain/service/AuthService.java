@@ -2,6 +2,7 @@ package com.old.silence.auth.center.domain.service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import com.old.silence.auth.center.domain.model.Role;
 import com.old.silence.auth.center.domain.model.UserRole;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.domain.repository.UserRepository;
@@ -21,6 +23,7 @@ import com.old.silence.auth.center.security.SilenceAuthCenterServerTokenAuthorit
 import com.old.silence.auth.center.security.SilencePrincipal;
 import com.old.silence.auth.center.util.PasswordUtil;
 import com.old.silence.auth.center.vo.LoginVo;
+import com.old.silence.auth.center.vo.RoleView;
 import com.old.silence.core.util.CollectionUtils;
 
 
@@ -53,24 +56,21 @@ public class AuthService {
             throw AuthCenterMessages.PASSWORD_NOT_CORRECT.createException();
         }
 
-        var userRoles = user.getUserRoles();
-        if (CollectionUtils.isEmpty(userRoles) && BigInteger.ONE.equals(user.getId())) {
-            userRoles = roleRepository.findByStatus(true, UserRole.class);
+        Set<SilenceAuthCenterRole> silenceAuthCenterRoles = new HashSet<>();
+        if (CollectionUtils.isEmpty(user.getUserRoles()) && BigInteger.ONE.equals(user.getId())) {
+            var allValidRoles = roleRepository.findByStatus(true, RoleView.class);
+            silenceAuthCenterRoles = CollectionUtils.transformToSet(allValidRoles, role -> new SilenceAuthCenterRole(role.getCode(),
+                    role.getName(), role.getAppCode()));
+        } else {
+            silenceAuthCenterRoles = CollectionUtils.transformToSet(user.getUserRoles(), role -> new SilenceAuthCenterRole(role.getRole().getCode(),
+                    role.getRole().getName(), role.getRole().getAppCode()));
         }
 
         List<MenuDto> currentUserMenuTree = menuService.getCurrentUserMenuTree(user.getId());
         var permissions = flattenMenu(currentUserMenuTree);
         
-        
+        var principal = new SilencePrincipal(user.getId(), user.getUsername(), user.getNickname(), silenceAuthCenterRoles, permissions);
 
-        var principal = new SilencePrincipal(
-                CollectionUtils.transformToSet(userRoles, role -> new SilenceAuthCenterRole(role.getRole().getCode(),
-                        role.getRole().getName(), role.getRole().getAppCode())),
-                permissions
-        );
-        principal.setUsername(user.getUsername());
-        principal.setCnName(user.getNickname());
-        principal.setUserId(user.getId());
         // 生成token
         var token = silenceAuthCenterServerTokenAuthority.issueToken(principal);
 

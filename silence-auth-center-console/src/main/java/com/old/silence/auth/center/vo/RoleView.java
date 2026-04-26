@@ -16,6 +16,8 @@ public interface RoleView extends AuditableView {
 
     String getCode();
 
+    String getAppCode();
+
     String getDescription() ;
 
     Boolean getStatus();

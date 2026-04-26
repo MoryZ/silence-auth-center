@@ -51,11 +51,9 @@ public class UserService {
         return userRepository.queryPage(page, queryWrapper, projectionType);
     }
 
-
     public <T> Optional<T> findById(BigInteger id, Class<T> projectionType) {
         return userRepository.findById(id, projectionType);
     }
-
 
     @Transactional
     public BigInteger create(User user) {
