@@ -25,19 +25,7 @@ public interface NoticeRepository {
      */
     int create(Notice notice);
 
-    /**
-     * 更新配置环境
-     *
-     * @param notice 配置环境信息
-     */
-    int update(Notice notice);
 
-    /**
-     * 删除配置环境
-     *
-     * @param id 配置环境ID
-     */
-    int deleteById(BigInteger id);
 
     /**
      * 获取通知列表 根据状态

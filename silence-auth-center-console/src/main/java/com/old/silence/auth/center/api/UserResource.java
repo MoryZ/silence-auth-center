@@ -1,12 +1,5 @@
 package com.old.silence.auth.center.api;
 
-import jakarta.validation.constraints.NotEmpty;
-
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,15 +13,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.api.assembler.UserMapper;
 import com.old.silence.auth.center.domain.model.User;
-import com.old.silence.auth.center.domain.model.UserRole;
 import com.old.silence.auth.center.domain.service.UserService;
 import com.old.silence.auth.center.dto.ModifyUserPasswordCommand;
-import com.old.silence.auth.center.dto.UserCommand;
 import com.old.silence.auth.center.dto.ResetUserPasswordCommand;
+import com.old.silence.auth.center.dto.UserCommand;
 import com.old.silence.auth.center.dto.UserQuery;
-import com.old.silence.auth.center.vo.UserVo;
-import com.old.silence.core.util.CollectionUtils;
+import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
+import com.old.silence.auth.center.security.SilenceAuthCenterContextHolder;
+import com.old.silence.auth.center.vo.UserView;
+import com.old.silence.core.exception.ResourceNotFoundException;
 import com.old.silence.data.commons.converter.QueryWrapperConverter;
+
+import java.math.BigInteger;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -42,28 +38,27 @@ public class UserResource {
         this.userService = userService;
     }
 
-    @GetMapping("/users/{id}/roles")
-    @PreAuthorize("@perm.hasAuthority('system:user:list')")
-    public List<BigInteger> getUserRoleIds(@PathVariable BigInteger id) {
-        return userService.getUserRoleIds(id);
-    }
-
     @GetMapping(value = "/users", params = {"pageNo", "pageSize"})
-    @PreAuthorize("@perm.hasAuthority('system:user:page')")
-    public IPage<UserVo> query(Page<User> page, UserQuery query) {
+    public IPage<UserView> query(Page<User> page, UserQuery query) {
         var queryWrapper = QueryWrapperConverter.convert(query, User.class);
-        return userService.query(page, queryWrapper);
+        return userService.query(page, queryWrapper, UserView.class);
     }
 
     @GetMapping("/users/{id}")
-    @PreAuthorize("@perm.hasAuthority('system:user:list')")
-    public UserVo getUserById(@PathVariable BigInteger id) {
-        User user = userService.findById(id);
-        return userMapper.toUserVo(user);
+    public UserView findById(@PathVariable BigInteger id) {
+        return userService.findById(id, UserView.class).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @GetMapping("/users/info")
+    public UserView getCurrentUserInfo() {
+        var userId = SilenceAuthCenterContextHolder.getAuthenticatedUserId()
+                .orElseThrow(AuthCenterMessages.USER_NOT_EXIST::createException);
+
+        return userService.findById(userId, UserView.class)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     @PostMapping("/users")
-    @PreAuthorize("@perm.hasAuthority('system:user:add')")
     public BigInteger create(@RequestBody UserCommand userCommand) {
         var user = userMapper.convert(userCommand);
         return userService.create(user); // NO SONAR
@@ -76,7 +71,6 @@ public class UserResource {
     }
 
     @PutMapping("/users/{id}")
-    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void update(@PathVariable BigInteger id, @RequestBody UserCommand userCommand) {
         var user = userMapper.convert(userCommand);
         user.setId(id); //NO SONAR
@@ -84,13 +78,11 @@ public class UserResource {
     }
 
     @PutMapping("/users/{id}/disable")
-    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void disable(@PathVariable BigInteger id) {
         userService.updateUserStatus(id, false);
     }
 
     @PutMapping("/users/{id}/enable")
-    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
     public void enable(@PathVariable BigInteger id) {
         userService.updateUserStatus(id, true);
     }
@@ -105,21 +97,8 @@ public class UserResource {
         userService.modifyPassword(modifyUserPasswordCommand.getUsername(), modifyUserPasswordCommand.getNewPassword());
     }
 
-    @PutMapping("/users/{id}/roles")
-    @PreAuthorize("@perm.hasAuthority('system:user:edit')")
-    public void assignUserRoles(@PathVariable BigInteger id, @RequestBody @NotEmpty Set<BigInteger> roleIds) {
-        var userRoles = CollectionUtils.transformToList(roleIds, roleId -> {
-            var userRole = new UserRole();
-            userRole.setRoleId(roleId);
-            userRole.setUserId(id);
-
-            return userRole;
-        });
-        userService.assignUserRoles(id, userRoles);
-    }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("@perm.hasAuthority('system:user:delete')")
     public void deleteUser(@PathVariable BigInteger id) {
         userService.delete(id);
     }

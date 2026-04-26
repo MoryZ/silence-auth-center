@@ -44,15 +44,10 @@ public class MenuService {
         this.userRoleRepository = userRoleRepository;
     }
 
-    public Page<Menu> query(Page<Menu> page, QueryWrapper<Menu> queryWrapper) {
-        return menuRepository.query(page, queryWrapper);
-    }
-
     public List<TreeDto> getMenuTree() {
         // 获取所有菜单列表（MyBatis-Plus 自动过滤已删除）
         List<Menu> menus = menuRepository.findAllByStatus(true);
         var treeDTOS = CollectionUtils.transformToList(menus, node -> new TreeDto(node.getId(), node.getName(), node.getParentId()));
-
 
         // 转换为树形结构
         return TreeFormatUtils.listToTree(treeDTOS, TreeDto::getId, TreeDto::getParentId, TreeDto::setChildren);
@@ -148,7 +143,7 @@ public class MenuService {
     public List<Menu> getCurrentUserMenus(BigInteger userId) {
 
         List<Menu> menus;
-        //如果是超管，返回所有资源（MyBatis-Plus 自动过滤已删除）
+        //如果是超管，返回所有资源
         if (BigInteger.ONE.compareTo(userId) == 0) {
             menus = menuRepository.findAllByStatus(true);
         } else {
@@ -171,7 +166,7 @@ public class MenuService {
                 return List.of();
             }
 
-            // 获取权限标识列表（MyBatis-Plus 自动过滤已删除）
+            // 获取权限标识列表
             menus = menuRepository.findByIdInAndStatus(menuIds, true);
 
         }

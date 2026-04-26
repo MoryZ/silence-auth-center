@@ -16,14 +16,13 @@ import com.old.silence.auth.center.domain.repository.UserRepository;
 import com.old.silence.auth.center.domain.repository.UserRoleRepository;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
 import com.old.silence.auth.center.util.PasswordUtil;
-import com.old.silence.auth.center.vo.UserVo;
 import com.old.silence.core.exception.ResourceNotFoundException;
 import com.old.silence.core.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -48,30 +47,13 @@ public class UserService {
         this.passwordUtil = passwordUtil;
     }
 
-    public IPage<UserVo> query(Page<User> page, QueryWrapper<User> queryWrapper) {
-        var userPage = userRepository.queryPage(page, queryWrapper, UserVo.class);
-
-        var userIds = userPage.getRecords()
-                .stream().map(UserVo::getId).collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(userIds)) {
-            return userPage;
-        }
-        var userRoles = userRoleRepository.findByUserIdIn(userIds);
-        var groupingByUserIdRoleIdsMap = userRoles.stream()
-                .collect(Collectors.groupingBy(UserRole::getUserId, Collectors.mapping(
-                        UserRole::getRoleId,
-                        Collectors.toSet()  // 去重
-                )));
-        for (UserVo record : userPage.getRecords()) {
-            record.setRoleIds(groupingByUserIdRoleIdsMap.get(record.getId()));
-        }
-        return userPage;
+    public <T> IPage<T> query(Page<User> page, QueryWrapper<User> queryWrapper, Class<T> projectionType) {
+        return userRepository.queryPage(page, queryWrapper, projectionType);
     }
 
 
-    public User findById(BigInteger id) {
-        return userRepository.findById(id, User.class)
-                .orElseThrow(ResourceNotFoundException::new);
+    public <T> Optional<T> findById(BigInteger id, Class<T> projectionType) {
+        return userRepository.findById(id, projectionType);
     }
 
 
@@ -91,12 +73,7 @@ public class UserService {
         String encodedPassword = passwordUtil.encodePassword(user.getPassword());
         user.setPassword(encodedPassword);
         userRepository.create(user);
-        
-        // 分配角色
-        if (CollectionUtils.isEmpty(user.getUserRoles())) {
-            assignUserRoles(user.getId(), user.getUserRoles());
-        }
-        
+
         logger.info("用户创建成功：id={}, username={}", user.getId(), user.getUsername());
         return user.getId();
     }
@@ -135,7 +112,8 @@ public class UserService {
         logger.info("更新用户信息：id={}, username={}", user.getId(), user.getUsername());
         
         // 检查用户是否存在
-        User existingUser = findById(user.getId());
+        User existingUser = findById(user.getId(), User.class)
+                .orElseThrow(ResourceNotFoundException::new);
         
         // 处理密码更新
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
@@ -152,11 +130,6 @@ public class UserService {
         // 更新用户信息
         userRepository.update(user);
 
-        // 更新角色
-        if (user.getUserRoles() != null) {
-            assignUserRoles(user.getId(), user.getUserRoles());
-        }
-        
         logger.info("用户信息更新成功：id={}", user.getId());
     }
 

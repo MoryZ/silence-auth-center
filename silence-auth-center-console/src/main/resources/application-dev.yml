@@ -10,7 +10,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL:jdbc:mysql://localhost:3306/silence-platform?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:silenceopr@2026}
+    password: ${DB_PASSWORD:123456}
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: 10000      # 10秒 - 及时发现连接问题

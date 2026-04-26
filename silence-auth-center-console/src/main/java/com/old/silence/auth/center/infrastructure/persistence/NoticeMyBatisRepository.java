@@ -38,17 +38,6 @@ public class NoticeMyBatisRepository implements NoticeRepository {
     }
 
     @Override
-    public int update(Notice notice) {
-        return noticeDao.updateById(notice);
-    }
-
-    @Override
-    public int deleteById(BigInteger id) {
-        return noticeDao.deleteById(id);
-    }
-
-
-    @Override
     public List<Notice> getNoticesByStatus(NoticeStatus status) {
         var queryWrapper = new QueryWrapper<Notice>();
 

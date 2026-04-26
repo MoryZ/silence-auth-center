@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.Menu;
 import com.old.silence.auth.center.domain.repository.MenuRepository;
 import com.old.silence.auth.center.enums.MenuType;
@@ -25,11 +23,6 @@ public class MenuMyBatisRepository implements MenuRepository {
     public MenuMyBatisRepository(MenuDao menuDao, RoleMenuDao roleMenuDao) {
         this.menuDao = menuDao;
         this.roleMenuDao = roleMenuDao;
-    }
-
-    @Override
-    public Page<Menu> query(Page<Menu> page, QueryWrapper<Menu> queryWrapper) {
-        return menuDao.selectPage(page, queryWrapper);
     }
 
     @Override

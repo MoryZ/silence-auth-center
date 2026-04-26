@@ -2,22 +2,21 @@ package com.old.silence.auth.center.domain.service;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.old.silence.auth.center.api.assembler.RoleMapper;
 import com.old.silence.auth.center.domain.model.Role;
 import com.old.silence.auth.center.domain.model.RoleMenu;
 import com.old.silence.auth.center.domain.repository.RoleMenuRepository;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
-import com.old.silence.auth.center.vo.RoleVo;
+import com.old.silence.auth.center.vo.RoleView;
 
 @Service
 public class RoleService {
@@ -36,26 +35,20 @@ public class RoleService {
         return roleRepository.query(page, queryWrapper);
     }
 
-    public List<RoleVo> minimumRoles() {
-        List<Role> roles = roleRepository.findByStatus(true);
+    public List<RoleView> minimumRoles() {
+        List<RoleView> roles = roleRepository.findByStatus(true, RoleView.class);
         return roles.stream()
                 .filter(role -> !"ROLE_ADMIN".equals(role.getCode()))
-                .map(this::enhanceRole)
                 .collect(Collectors.toList());
     }
 
 
-    public List<RoleVo> listAllRoles() {
-        List<Role> roles = roleRepository.findByStatus(true);
-
-        return roles.stream()
-                .map(this::enhanceRole)
-                .collect(Collectors.toList());
+    public List<RoleView> listAllRoles() {
+        return roleRepository.findByStatus(true, RoleView.class);
     }
 
-
-    public Role findById(BigInteger id) {
-        return getRole(id);
+    public <T> Optional<T> findById(BigInteger id, Class<T> projectionType) {
+        return roleRepository.findById(id, projectionType);
     }
 
 
@@ -110,34 +103,15 @@ public class RoleService {
 
     private Role getRole(BigInteger id) {
         // 检查角色是否存在
-        Role role = roleRepository.findById(id);
-        if (role == null) {
+        Optional<Role> roleOptional = roleRepository.findById(id, Role.class);
+        if (roleOptional.isEmpty()) {
             throw AuthCenterMessages.ROLE_NOT_EXIST.createException();
         }
-        return role;
+        return roleOptional.get();
     }
 
-    public void updateStatus(BigInteger id, Boolean status) {
-        // 检查角色是否存在
-        var role = getRole(id);
-
-        // 更新状态
-        role.setStatus(status);
-        roleRepository.update(role);
-
-    }
-
-
-    public List<BigInteger> getRoleMenuIds(BigInteger roleId) {
-        return roleMenuRepository.findByRoleId(roleId).stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
-    }
-
-
-    private RoleVo enhanceRole(Role role) {
-        var roleMapper = Mappers.getMapper(RoleMapper.class);
-        var roleVo = roleMapper.convertToDto(role);
-        roleVo.setMenuIds(getRoleMenuIds(role.getId()));
-        return roleVo;
+    public int updateStatus(BigInteger id, Boolean status) {
+        return roleRepository.updateStatusById(status, id);
     }
 
     private boolean isRoleCodeExists(String code) {
@@ -147,14 +121,14 @@ public class RoleService {
     public void assignRoleMenus(BigInteger id, List<BigInteger> menuIds) {
         logger.info("分配角色菜单：roleId={}, menuCount={}", id, menuIds.size());
         
-        var role = roleRepository.findById(id);
-        if (role == null) {
+        var roleOptional = roleRepository.findById(id, Role.class);
+        if (roleOptional.isEmpty()) {
             logger.warn("角色菜单分配失败，角色不存在：roleId={}", id);
             throw AuthCenterMessages.ROLE_NOT_EXIST.createException();
         }
 
         // 清空角色菜单关联
-        roleMenuRepository.deleteByRoleId(role.getId());
+        roleMenuRepository.deleteByRoleId(id);
 
 
         // 重新分配角色菜单关联

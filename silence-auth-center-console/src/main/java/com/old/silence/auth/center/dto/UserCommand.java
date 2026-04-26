@@ -53,12 +53,6 @@ public class UserCommand {
     private Boolean status;
 
 
-    /**
-     * 角色ID列表
-     */
-    private List<BigInteger> roleIds;
-
-
     public BigInteger getId() {
         return id;
     }
@@ -123,11 +117,4 @@ public class UserCommand {
         this.status = status;
     }
 
-    public List<BigInteger> getRoleIds() {
-        return roleIds;
-    }
-
-    public void setRoleIds(List<BigInteger> roleIds) {
-        this.roleIds = roleIds;
-    }
 }

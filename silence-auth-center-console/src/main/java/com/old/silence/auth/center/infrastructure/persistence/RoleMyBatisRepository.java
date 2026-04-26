@@ -2,12 +2,13 @@ package com.old.silence.auth.center.infrastructure.persistence;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.Role;
 import com.old.silence.auth.center.domain.model.RoleMenu;
@@ -25,35 +26,28 @@ public class RoleMyBatisRepository implements RoleRepository {
     private final RoleDao roleDao;
     private final RoleMenuDao roleMenuDao;
 
+    public RoleMyBatisRepository(RoleDao roleDao, RoleMenuDao roleMenuDao) {
+        this.roleDao = roleDao;
+        this.roleMenuDao = roleMenuDao;
+    }
     @Override
     public boolean existsByCode(String code) {
-        return roleDao.existsByCode(code);
+        return roleDao.existsByQuery(new LambdaQueryWrapper<Role>().eq(Role::getCode, code));
     }
 
     @Override
-    public Set<Role> findRoleByUserId(BigInteger userId) {
-        return roleDao.findRoleByUserId(userId);
+    public <T> Optional<T> findById(BigInteger id, Class<T> projectionType) {
+        return roleDao.findById(id , projectionType);
+    }
+
+    @Override
+    public <T> List<T> findByStatus(boolean status, Class<T> projectionType) {
+        return roleDao.findByQuery(new LambdaQueryWrapper<Role>().eq(Role::getStatus, status), projectionType);
     }
 
     @Override
     public Page<Role> query(Page<Role> page, QueryWrapper<Role> queryWrapper) {
         return roleDao.selectPage(page, queryWrapper);
-    }
-
-    public RoleMyBatisRepository(RoleDao roleDao, RoleMenuDao roleMenuDao) {
-        this.roleDao = roleDao;
-        this.roleMenuDao = roleMenuDao;
-    }
-
-
-    @Override
-    public Role findById(BigInteger id) {
-        return roleDao.selectById(id);
-    }
-
-    @Override
-    public List<Role> findByStatus(boolean status) {
-        return roleDao.findByStatus(status);
     }
 
     @Override
@@ -91,6 +85,14 @@ public class RoleMyBatisRepository implements RoleRepository {
         return rowsAffected;
     }
 
+    @Override
+    public int updateStatusById(Boolean status, BigInteger id) {
+        UpdateWrapper<Role> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda()
+                .set(Role::getStatus, status)
+                .eq(Role::getId, id);
+        return roleDao.update(updateWrapper);   // WHE
+    }
 
     private void assignRoleMenus(BigInteger roleId, List<RoleMenu> roleMenus) {
         // 删除原有菜单权限

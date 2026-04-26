@@ -2,6 +2,7 @@ package com.old.silence.auth.center.domain.repository;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,8 +16,6 @@ import com.old.silence.auth.center.domain.model.Role;
 public interface RoleRepository {
 
     boolean existsByCode(String code);
-
-    Set<Role> findRoleByUserId(BigInteger userId);
 
     /**
      * 查询所有角色
@@ -32,9 +31,9 @@ public interface RoleRepository {
      * @param id 角色ID
      * @return Role 对象
      */
-    Role findById(BigInteger id);
+    <T> Optional<T> findById(BigInteger id, Class<T> projectionType);
 
-    List<Role> findByStatus(boolean status);
+    <T> List<T> findByStatus(boolean status, Class<T> projectionType);
 
 
     /**
@@ -61,4 +60,5 @@ public interface RoleRepository {
     int delete(BigInteger id);
 
 
+    int updateStatusById(Boolean status, BigInteger id);
 }

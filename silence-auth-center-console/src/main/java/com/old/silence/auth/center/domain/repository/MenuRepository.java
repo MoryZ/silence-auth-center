@@ -3,8 +3,6 @@ package com.old.silence.auth.center.domain.repository;
 import java.math.BigInteger;
 import java.util.List;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.old.silence.auth.center.domain.model.Menu;
 import com.old.silence.auth.center.enums.MenuType;
 
@@ -13,8 +11,6 @@ import com.old.silence.auth.center.enums.MenuType;
  */
 
 public interface MenuRepository {
-
-    Page<Menu> query(Page<Menu> page, QueryWrapper<Menu> queryWrapper);
 
     boolean existsByParentId(BigInteger parentId);
 

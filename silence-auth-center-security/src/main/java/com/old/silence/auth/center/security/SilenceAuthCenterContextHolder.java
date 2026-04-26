@@ -55,17 +55,6 @@ public class SilenceAuthCenterContextHolder {
         return authentication.getAuthorities();
     }
 
-    public static boolean isRoot() {
-        var authorities = getAuthorities();
-        if (CollectionUtils.isEmpty(authorities)) {
-            return false;
-        } else {
-            return authorities.stream().anyMatch(
-                    authority -> authority.getAuthority().equals(SecurityConstants.ROOT_ROLE_CODE)
-            );
-        }
-    }
-
     public static boolean isMaster() {
         var authorities = getAuthorities();
         if (CollectionUtils.isEmpty(authorities)) {

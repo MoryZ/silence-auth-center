@@ -1,5 +1,6 @@
 package com.old.silence.auth.center.domain.service;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.old.silence.auth.center.api.assembler.UserMapper;
+import com.old.silence.auth.center.domain.model.UserRole;
 import com.old.silence.auth.center.domain.repository.RoleRepository;
 import com.old.silence.auth.center.domain.repository.UserRepository;
 import com.old.silence.auth.center.dto.LoginCommand;
@@ -27,18 +28,17 @@ import com.old.silence.core.util.CollectionUtils;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final MenuService menuService;
     private final RoleRepository roleRepository;
+    private final MenuService menuService;
     private final PasswordUtil passwordUtil;
     private final SilenceAuthCenterServerTokenAuthority silenceAuthCenterServerTokenAuthority;
 
-    public AuthService(UserRepository userRepository, UserMapper userMapper, MenuService menuService, RoleRepository roleRepository, PasswordUtil passwordUtil,
+    public AuthService(UserRepository userRepository, RoleRepository roleRepository,
+                       MenuService menuService, PasswordUtil passwordUtil,
                        SilenceAuthCenterServerTokenAuthority silenceAuthCenterServerTokenAuthority) {
         this.userRepository = userRepository;
-        this.userMapper = userMapper;
-        this.menuService = menuService;
         this.roleRepository = roleRepository;
+        this.menuService = menuService;
         this.passwordUtil = passwordUtil;
         this.silenceAuthCenterServerTokenAuthority = silenceAuthCenterServerTokenAuthority;
     }
@@ -53,13 +53,19 @@ public class AuthService {
             throw AuthCenterMessages.PASSWORD_NOT_CORRECT.createException();
         }
 
+        var userRoles = user.getUserRoles();
+        if (CollectionUtils.isEmpty(userRoles) && BigInteger.ONE.equals(user.getId())) {
+            userRoles = roleRepository.findByStatus(true, UserRole.class);
+        }
+
         List<MenuDto> currentUserMenuTree = menuService.getCurrentUserMenuTree(user.getId());
         var permissions = flattenMenu(currentUserMenuTree);
+        
+        
 
-
-        var roles = roleRepository.findRoleByUserId(user.getId());
         var principal = new SilencePrincipal(
-                CollectionUtils.transformToSet(roles, role -> new SilenceAuthCenterRole(role.getCode(), role.getName(), role.getAppCode())),
+                CollectionUtils.transformToSet(userRoles, role -> new SilenceAuthCenterRole(role.getRole().getCode(),
+                        role.getRole().getName(), role.getRole().getAppCode())),
                 permissions
         );
         principal.setUsername(user.getUsername());
@@ -68,12 +74,8 @@ public class AuthService {
         // 生成token
         var token = silenceAuthCenterServerTokenAuthority.issueToken(principal);
 
-        var userInfoVo = userMapper.toUserVo(user);
-        userInfoVo.setPermissions(permissions);
         var loginResponse = new LoginVo();
         loginResponse.setToken(token);
-        loginResponse.setUserInfo(userInfoVo);
-        loginResponse.setMenus(currentUserMenuTree);
         return loginResponse;
     }
 
