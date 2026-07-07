@@ -1,0 +1,81 @@
+package com.old.silence.auth.center.infrastructure.persistence;
+
+import java.math.BigInteger;
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.old.silence.auth.center.domain.model.Menu;
+import com.old.silence.auth.center.domain.repository.MenuRepository;
+import com.old.silence.auth.center.enums.MenuType;
+import com.old.silence.auth.center.infrastructure.persistence.dao.MenuDao;
+import com.old.silence.auth.center.infrastructure.persistence.dao.RoleMenuDao;
+
+/**
+ * @author moryzang
+ */
+@Repository
+public class MenuMyBatisRepository implements MenuRepository {
+
+    private final MenuDao menuDao;
+    private final RoleMenuDao roleMenuDao;
+
+    public MenuMyBatisRepository(MenuDao menuDao, RoleMenuDao roleMenuDao) {
+        this.menuDao = menuDao;
+        this.roleMenuDao = roleMenuDao;
+    }
+
+    @Override
+    public boolean existsByParentId(BigInteger parentId) {
+        return menuDao.existsByParentId(parentId);
+    }
+
+    @Override
+    public Menu findById(BigInteger id) {
+        return menuDao.selectById(id);
+    }
+
+    @Override
+    public List<Menu> findAllByStatus(boolean status) {
+        var queryWrapper = new LambdaQueryWrapper<Menu>()
+                .eq(Menu::getStatus, status)
+                .orderByAsc(Menu::getSort);
+
+        return menuDao.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Menu> findAllByStatusAndTypeIn(boolean status, List<MenuType> types) {
+        var queryWrapper = new LambdaQueryWrapper<Menu>()
+                .in(Menu::getType, types)
+                .eq(Menu::getStatus, status)
+                .orderByAsc(Menu::getSort);
+        return menuDao.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<Menu> findByIdInAndStatus(List<BigInteger> menuIds, boolean status) {
+        var queryWrapper = new LambdaQueryWrapper<Menu>()
+                .in(Menu::getId, menuIds)
+                .eq(Menu::getStatus, status)
+                .orderByAsc(Menu::getSort);
+        return menuDao.selectList(queryWrapper);
+    }
+
+    @Override
+    public int create(Menu menu) {
+        return menuDao.insert(menu);
+    }
+
+    @Override
+    public int update(Menu menu) {
+        return menuDao.updateById(menu);
+    }
+
+    @Override
+    public void delete(BigInteger id) {
+        menuDao.deleteById(id);
+        // 删除角色菜单关联
+        roleMenuDao.deleteByMenuId(id);
+    }
+}

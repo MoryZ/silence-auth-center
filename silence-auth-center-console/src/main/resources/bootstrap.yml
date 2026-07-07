@@ -1,0 +1,19 @@
+server:
+  port: 8096
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 60MB
+  application.name: auth-service
+  profiles:
+    active: dev
+  messages.basename: messages/silence_auth_center_messages
+  liquibase:
+    change-log: classpath:/db/changelogs/changelog-master.xml
+    enabled: false
+
+platform:
+  system:
+    identifier: AC

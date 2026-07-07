@@ -1,0 +1,231 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.16.xsd">
+
+    <!-- sys_user 表 - 系统用户表 -->
+    <changeSet id="2026-02-09-001-create-sys-user" author="system">
+        <createTable tableName="sys_user" remarks="系统用户表">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(50)" remarks="用户名">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_username"/>
+            </column>
+            <column name="password" type="VARCHAR(100)" remarks="密码">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nickname" type="VARCHAR(50)" remarks="昵称"/>
+            <column name="avatar" type="VARCHAR(255)" remarks="头像URL"/>
+            <column name="email" type="VARCHAR(100)" remarks="邮箱"/>
+            <column name="phone" type="VARCHAR(20)" remarks="手机号"/>
+            <column name="status" type="BIT" defaultValue="b'1'" remarks="状态：0-禁用，1-启用">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BIT" defaultValue="b'0'" remarks="是否删除：0-未删除，1-已删除">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(100)" remarks="创建人"/>
+            <column name="created_date" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(100)" remarks="更新人"/>
+            <column name="updated_date" type="DATETIME" remarks="更新时间"/>
+            <column name="is_first_login" type="BIT" defaultValue="b'1'" remarks="是否首次登录">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password_changed_time" type="DATETIME" remarks="密码修改时间"/>
+            <column name="is_force_change_password" type="BIT" defaultValue="b'0'" remarks="是否强制修改密码">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_status_deleted" tableName="sys_user">
+            <column name="status"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- sys_role 表 - 系统角色表 -->
+    <changeSet id="2026-02-09-002-create-sys-role" author="system">
+        <createTable tableName="sys_role" remarks="系统角色表">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)" remarks="角色名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(50)" remarks="角色编码">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_code"/>
+            </column>
+            <column name="app_code" type="VARCHAR(100)" remarks="角色所属应用">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(200)" remarks="角色描述"/>
+            <column name="status" type="TINYINT" defaultValue="1" remarks="状态：0-禁用，1-启用">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="TINYINT" defaultValue="0" remarks="是否删除：0-未删除，1-已删除">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(100)" remarks="创建人"/>
+            <column name="created_date" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(100)" remarks="更新人"/>
+            <column name="updated_date" type="DATETIME" remarks="更新时间"/>
+        </createTable>
+        <createIndex indexName="idx_status_deleted" tableName="sys_role">
+            <column name="status"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- sys_menu 表 - 系统菜单表 -->
+    <changeSet id="2026-02-09-003-create-sys-menu" author="system">
+        <createTable tableName="sys_menu" remarks="系统菜单表">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="parent_id" type="BIGINT" defaultValue="0" remarks="父菜单ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)" remarks="菜单名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="module_type" type="VARCHAR(32)" remarks="菜单所属模块"/>
+            <column name="type" type="TINYINT UNSIGNED" remarks="菜单类型：1-目录，2-菜单，3-按钮">
+                <constraints nullable="false"/>
+            </column>
+            <column name="path" type="VARCHAR(200)" remarks="路由路径"/>
+            <column name="component" type="VARCHAR(200)" remarks="组件路径"/>
+            <column name="redirect" type="VARCHAR(256)" remarks="重定向"/>
+            <column name="meta" type="VARCHAR(500)" remarks="菜单元数据"/>
+            <column name="sort" type="INT UNSIGNED" defaultValue="0" remarks="显示顺序">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="BIT" defaultValue="b'1'" remarks="状态：0-禁用，1-启用">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BIT" defaultValue="b'0'" remarks="是否删除：0-未删除，1-已删除">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(100)" remarks="创建人"/>
+            <column name="created_date" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(100)" remarks="更新人"/>
+            <column name="updated_date" type="DATETIME" remarks="更新时间"/>
+        </createTable>
+        <createIndex indexName="idx_parent_id_deleted" tableName="sys_menu">
+            <column name="parent_id"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex indexName="idx_status_deleted" tableName="sys_menu">
+            <column name="status"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- sys_user_role 表 - 用户角色关联表 -->
+    <changeSet id="2026-02-09-004-create-sys-user-role" author="system">
+        <createTable tableName="sys_user_role" remarks="用户角色关联表">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT" remarks="用户ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT" remarks="角色ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(100)" remarks="创建人"/>
+            <column name="created_date" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(100)" remarks="更新人"/>
+            <column name="updated_date" type="DATETIME" remarks="更新时间"/>
+        </createTable>
+        <createIndex indexName="uk_user_role" tableName="sys_user_role" unique="true">
+            <column name="user_id"/>
+            <column name="role_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- sys_role_menu 表 - 角色菜单关联表 -->
+    <changeSet id="2026-02-09-005-create-sys-role-menu" author="system">
+        <createTable tableName="sys_role_menu" remarks="角色菜单关联表">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT" remarks="角色ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="menu_id" type="BIGINT" remarks="菜单ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(100)" remarks="创建人"/>
+            <column name="created_date" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(100)" remarks="更新人"/>
+            <column name="updated_date" type="DATETIME" remarks="更新时间"/>
+        </createTable>
+        <createIndex indexName="idx_role_id_deleted" tableName="sys_role_menu">
+            <column name="role_id"/>
+        </createIndex>
+        <createIndex indexName="idx_menu_id_deleted" tableName="sys_role_menu">
+            <column name="menu_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- sys_notice 表 - 系统通知表 -->
+    <changeSet id="2026-02-09-006-create-sys-notice" author="system">
+        <createTable tableName="sys_notice" remarks="系统通知表">
+            <column name="id" type="BIGINT" autoIncrement="true" remarks="主键ID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)" remarks="通知标题">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT" remarks="通知内容">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_id" type="BIGINT UNSIGNED" remarks="发送者ID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sender_name" type="VARCHAR(100)" remarks="发送者名称">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="TINYINT UNSIGNED" remarks="通知状态 0 未读 1 已读">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BIT" defaultValue="b'0'" remarks="是否有效">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(100)" remarks="创建人">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" remarks="创建时间">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="VARCHAR(100)" remarks="更新人员">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_date" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" remarks="更新时间">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_sender_name_deleted" tableName="sys_notice">
+            <column name="sender_name"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex indexName="idx_status_deleted" tableName="sys_notice">
+            <column name="status"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -1,0 +1,193 @@
+package com.old.silence.auth.center.domain.service;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.old.silence.auth.center.api.assembler.MenuMapper;
+import com.old.silence.auth.center.domain.model.Menu;
+import com.old.silence.auth.center.domain.model.RoleMenu;
+import com.old.silence.auth.center.domain.model.UserRole;
+import com.old.silence.auth.center.domain.repository.MenuRepository;
+import com.old.silence.auth.center.domain.repository.RoleMenuRepository;
+import com.old.silence.auth.center.domain.repository.UserRoleRepository;
+import com.old.silence.auth.center.dto.MenuDto;
+import com.old.silence.auth.center.enums.MenuType;
+import com.old.silence.auth.center.infrastructure.message.AuthCenterMessages;
+import com.old.silence.core.util.CollectionUtils;
+import com.old.silence.core.util.TreeFormatUtils;
+import com.old.silence.dto.TreeDto;
+
+@Service
+public class MenuService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
+
+    private final MenuRepository menuRepository;
+    private final MenuMapper menuMapper;
+    private final RoleMenuRepository roleMenuRepository;
+    private final UserRoleRepository userRoleRepository;
+
+    public MenuService(MenuRepository menuRepository, MenuMapper menuMapper,
+                       RoleMenuRepository roleMenuRepository, UserRoleRepository userRoleRepository) {
+        this.menuRepository = menuRepository;
+        this.menuMapper = menuMapper;
+        this.roleMenuRepository = roleMenuRepository;
+        this.userRoleRepository = userRoleRepository;
+    }
+
+    public List<TreeDto> getMenuTree() {
+        // 获取所有菜单列表（MyBatis-Plus 自动过滤已删除）
+        List<Menu> menus = menuRepository.findAllByStatus(true);
+        var treeDTOS = CollectionUtils.transformToList(menus, node -> new TreeDto(node.getId(), node.getName(), node.getParentId()));
+
+        // 转换为树形结构
+        return TreeFormatUtils.listToTree(treeDTOS, TreeDto::getId, TreeDto::getParentId, TreeDto::setChildren);
+    }
+
+    public List<MenuDto> getMenuList() {
+        // 获取所有菜单列表（MyBatis-Plus 自动过滤已删除）
+        var menus = menuRepository.findAllByStatusAndTypeIn(true, List.of(MenuType.CONTENTS, MenuType.MENU));
+        // 转换为树形结构
+        return buildMenuTree(menus);
+    }
+
+    public Menu findById(BigInteger id) {
+        Menu menu = menuRepository.findById(id);
+        if (menu == null) {
+            throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
+        }
+        return menu;
+    }
+
+
+    @Transactional
+    public BigInteger create(Menu menu) {
+        logger.info("创建新菜单：name={}, type={}", menu.getName(), menu.getType());
+        
+        // 创建菜单（deleted 字段由基类自动设置默认值）
+        menuRepository.create(menu);
+        
+        logger.info("菜单创建成功：id={}, name={}", menu.getId(), menu.getName());
+        return menu.getId();
+    }
+
+
+    @Transactional
+    public void update(Menu menu) {
+        logger.info("更新菜单：id={}, name={}", menu.getId(), menu.getName());
+        
+        // 检查菜单是否存在
+        Menu existingMenu = menuRepository.findById(menu.getId());
+        if (existingMenu == null) {
+            logger.warn("菜单更新失败，菜单不存在：id={}", menu.getId());
+            throw AuthCenterMessages.MENU_NOT_EXIST.createException("菜单不存在");
+        }
+
+        // 更新菜单信息
+        menuRepository.update(menu);
+        logger.info("菜单更新成功：id={}", menu.getId());
+    }
+
+
+    @Transactional
+    public void delete(BigInteger id) {
+        logger.info("删除菜单：id={}", id);
+        
+        // 检查菜单是否存在
+        Menu menu = menuRepository.findById(id);
+        if (menu == null) {
+            logger.warn("菜单删除失败，菜单不存在：id={}", id);
+            throw AuthCenterMessages.MENU_NOT_EXIST.createException();
+        }
+
+        // 检查是否有子菜单（MyBatis-Plus 自动过滤已删除）
+        boolean hasChildren = menuRepository.existsByParentId(id);
+        if (hasChildren) {
+            logger.warn("菜单删除失败，存在子菜单：id={}", id);
+            throw AuthCenterMessages.SUB_MENU_EXIST.createException();
+        }
+
+        // 逻辑删除菜单（MyBatis-Plus 会自动处理 deleted 字段）
+        menuRepository.delete(id);
+        logger.info("菜单删除成功：id={}", id);
+    }
+
+    public void updateMenuStatus(BigInteger id, Boolean status) {
+        // 检查菜单是否存在
+        Menu menu = menuRepository.findById(id);
+        if (menu == null) {
+            throw AuthCenterMessages.MENU_NOT_EXIST.createException();
+        }
+
+        // 更新状态
+        menu.setStatus(status);
+        menuRepository.update(menu);
+    }
+
+
+    public List<MenuDto> getCurrentUserMenuTree(BigInteger userId) {
+        var menus = getCurrentUserMenus(userId);
+        return buildMenuTree(menus);
+    }
+
+
+    public List<Menu> getCurrentUserMenus(BigInteger userId) {
+
+        List<Menu> menus;
+        //如果是超管，返回所有资源
+        if (BigInteger.ONE.compareTo(userId) == 0) {
+            menus = menuRepository.findAllByStatus(true);
+        } else {
+            // 获取用户角色ID列表
+            List<BigInteger> roleIds = userRoleRepository.findByUserId(userId)
+                    .stream()
+                    .map(UserRole::getRoleId)
+                    .collect(Collectors.toList());
+
+            if (CollectionUtils.isEmpty(roleIds)) {
+                return List.of();
+            }
+
+            // 获取角色菜单ID列表
+            List<BigInteger> menuIds = roleMenuRepository.findByRoleIdIn(roleIds)
+                    .stream()
+                    .map(RoleMenu::getMenuId)
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(menuIds)) {
+                return List.of();
+            }
+
+            // 获取权限标识列表
+            menus = menuRepository.findByIdInAndStatus(menuIds, true);
+
+        }
+        return menus;
+
+
+    }
+
+
+    private List<MenuDto> buildMenuTree(List<Menu> menus) {
+        var menuDtos = menus.stream().map(menuMapper::convertToDto).toList();
+        // 构建父子关系
+        Map<BigInteger, List<MenuDto>> parentMap = menuDtos.stream()
+                .collect(Collectors.groupingBy(MenuDto::getParentId));
+
+        // 设置子菜单
+        menuDtos.forEach(menu -> menu.setChildren(parentMap.getOrDefault(menu.getId(), new ArrayList<>())));
+
+        // 返回顶层菜单
+        return parentMap.getOrDefault(BigInteger.ZERO, new ArrayList<>());
+    }
+
+
+}

@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "silence.auth.center.security.api.white-list",
+      "type": "java.lang.String[]",
+      "description": "security white-list"
+    }
+  ]
+}
