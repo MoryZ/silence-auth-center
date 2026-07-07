@@ -5,7 +5,7 @@ WORKDIR /app
 ENV TZ=Asia/Shanghai \
     JAVA_OPTS="-XX:+UseG1GC"
 
-COPY target/*.jar app.jar
+COPY silence-auth-center-console/target/*.jar app.jar
 
 EXPOSE 8096
 
