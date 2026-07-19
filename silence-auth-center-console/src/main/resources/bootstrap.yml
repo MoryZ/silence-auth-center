@@ -17,3 +17,10 @@ spring:
 platform:
   system:
     identifier: AC
+
+silence:
+  auth:
+    center:
+      jwt:
+        secret: ${SILENCE_AUTH_CENTER_JWT_SECRET:silence-auth-center}
+        expiration: ${SILENCE_AUTH_CENTER_JWT_EXPIRATION_SECONDS:21600}
